@@ -8,6 +8,7 @@ import {
   ChevronRight, 
   Sparkles 
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { CATEGORIES } from '../../services/api';
 import DynamicIcon from '../DynamicIcon';
 import { formatRupiah, formatShortDate } from '../../utils/financeHelpers';
@@ -69,6 +70,157 @@ export default function HomeTab({
   };
 
   const unusualSpendings = getUnusualSpendings();
+
+  // Active Slide Index for dynamic horizontal insights carousel
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  // Get premium structural advice when budgets are exceeded or critical
+  const getBudgetAdvice = () => {
+    const activeBudgets = budgets.filter(b => b.limit > 0);
+    const overBudgets = activeBudgets.filter(b => b.spent >= b.limit);
+    const warningBudgets = activeBudgets.filter(b => b.spent >= b.limit * 0.8 && b.spent < b.limit);
+
+    if (overBudgets.length > 0) {
+      const firstOver = overBudgets[0];
+      const cat = CATEGORIES.find(c => c.id === firstOver.categoryId);
+      return {
+        type: 'danger',
+        categoryName: cat?.name || 'Kategori',
+        limit: firstOver.limit,
+        spent: firstOver.spent,
+        overAmount: firstOver.spent - firstOver.limit,
+        title: 'Darurat Anggaran! 🚨',
+        message: `Anggaran ${cat?.name || 'Kategori'} Anda bocor ${formatRupiah(firstOver.spent - firstOver.limit)}. Hentikan segera belanja impulsif pada pos ini!`,
+        advice: '💡 Tindakan Mandiri: Tutup deficit dengan cara memindahkan sisa alokasi kuota dari pos belanja lain yang masih hijau, atau tunda belanja hingga awal bulan depan.'
+      };
+    }
+
+    if (warningBudgets.length > 0) {
+      const firstWarn = warningBudgets[0];
+      const cat = CATEGORIES.find(c => c.id === firstWarn.categoryId);
+      return {
+        type: 'warning',
+        categoryName: cat?.name || 'Kategori',
+        limit: firstWarn.limit,
+        spent: firstWarn.spent,
+        remaining: firstWarn.limit - firstWarn.spent,
+        title: 'Limit Anggaran Tipis! 🔔',
+        message: `Dompet kategori ${cat?.name || 'Kategori'} sudah terpakai ${Math.round((firstWarn.spent / firstWarn.limit) * 100)}%. Sisa saku aman Anda hanya ${formatRupiah(firstWarn.limit - firstWarn.spent)}.`,
+        advice: '💡 Tindakan Mandiri: Aktifkan rem belanja. Gunakan pilihan alternatif hemat, dan prioritaskan kebutuhan primer saja hingga siklus anggaran berganti.'
+      };
+    }
+
+    return null;
+  };
+
+  const budgetAdvice = getBudgetAdvice();
+
+  // Dynamically assemble Carousel slides if anomalies or budget advice exist
+  const carouselSlides: { id: string; element: React.ReactNode }[] = [];
+
+  if (unusualSpendings.length > 0) {
+    carouselSlides.push({
+      id: 'anomaly',
+      element: (
+        <div className="p-4 rounded-[22px] bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 border border-indigo-850/30 text-white shadow-md relative overflow-hidden h-[185px] flex flex-col justify-between transition-all duration-300">
+          <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/10 rounded-full translate-x-12 -translate-y-12 blur-xl"></div>
+          <div className="absolute -left-4 -bottom-4 w-16 h-16 bg-purple-500/10 rounded-full blur-md"></div>
+          
+          <div className="relative z-10 space-y-2">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                  <Sparkles size={13} className="animate-pulse" />
+                </div>
+                <h3 className="text-[10px] font-black tracking-wide uppercase text-indigo-355">Analisis Anomali Mingguan</h3>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-indigo-500/25 border border-indigo-400/20 text-[8px] font-black text-indigo-300 uppercase tracking-wider">
+                Unusual Spendings
+              </span>
+            </div>
+            
+            <p className="text-[11px] text-slate-300 leading-snug">
+              Ada <span className="text-indigo-200 font-extrabold">{unusualSpendings.length} transaksi tidak biasa</span> yang jauh melebihi pengeluaran rata-rata Anda:
+            </p>
+
+            <div className="grid grid-cols-1 gap-1.5 mt-1">
+              {unusualSpendings.slice(0, 1).map(tx => {
+                const cat = CATEGORIES.find(c => c.id === tx.categoryId);
+                return (
+                  <div key={tx.id} className="p-2 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className={`w-7 h-7 rounded-lg ${cat?.color || 'bg-slate-800 text-slate-400'} flex items-center justify-center flex-shrink-0 text-xs`}>
+                        {cat && <DynamicIcon name={cat.icon} size={12} />}
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-[11px] font-bold text-white truncate">{tx.title}</h4>
+                        <span className="text-[9px] text-slate-400 block mt-0.5">{formatShortDate(tx.date)}</span>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <span className="text-[11px] font-black text-rose-300 block">-{formatRupiah(tx.amount)}</span>
+                      <span className="text-[8px] font-bold text-indigo-455 uppercase tracking-wide">
+                        {tx.amount >= 500000 ? 'Skala Besar 🚨' : 'Lonjakan 2x ⚡'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          
+          <p className="text-[9px] text-slate-400 italic leading-snug pt-1.5 border-t border-white/[0.05]">
+            💡 Tip: Rem pembelian impulsif besar di luar anggaran mingguan Anda.
+          </p>
+        </div>
+      )
+    });
+  }
+
+  if (budgetAdvice) {
+    carouselSlides.push({
+      id: 'budget-overrun',
+      element: (
+        <div className="p-4 rounded-[22px] bg-gradient-to-br from-rose-900 via-rose-955 to-slate-900 border border-rose-850/30 text-white shadow-md relative overflow-hidden h-[185px] flex flex-col justify-between transition-all duration-300">
+          <div className="absolute right-0 top-0 w-32 h-32 bg-rose-500/10 rounded-full translate-x-12 -translate-y-12 blur-xl"></div>
+          <div className="absolute -left-4 -bottom-4 w-16 h-16 bg-pink-500/10 rounded-full blur-md"></div>
+          
+          <div className="relative z-10 space-y-2">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center">
+                  <AlertCircle size={13} className="animate-bounce" />
+                </div>
+                <h3 className="text-[10px] font-black tracking-wide uppercase text-rose-355">{budgetAdvice.title}</h3>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-rose-500/25 border border-rose-400/20 text-[8px] font-black text-rose-350 uppercase tracking-wider">
+                Budget Advice
+              </span>
+            </div>
+            
+            <p className="text-[11px] text-slate-300 leading-snug">
+              {budgetAdvice.message}
+            </p>
+          </div>
+          
+          <p className="text-[9.5px] text-rose-200 font-medium leading-snug pt-1.5 border-t border-white/[0.05] italic">
+            {budgetAdvice.advice}
+          </p>
+        </div>
+      )
+    });
+  }
+
+  // Auto-scroll/Auto-play horizontal sliding interval
+  useEffect(() => {
+    if (carouselSlides.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % carouselSlides.length);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [carouselSlides.length]);
 
   // Insights helper
   const getInsights = () => {
@@ -330,58 +482,31 @@ export default function HomeTab({
         )}
       </div>
 
-      {/* Analisis Mingguan: Pengeluaran Tidak Biasa */}
-      {unusualSpendings.length > 0 && (
-        <div className="p-4 rounded-[22px] bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 border border-indigo-850/30 text-white shadow-md relative overflow-hidden animate-scale-in">
-          <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/10 rounded-full translate-x-12 -translate-y-12 blur-xl"></div>
-          <div className="absolute -left-4 -bottom-4 w-16 h-16 bg-purple-500/10 rounded-full blur-md"></div>
-          
-          <div className="relative z-10 space-y-3">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="w-6.5 h-6.5 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                  <Sparkles size={13} className="animate-pulse" />
-                </div>
-                <h3 className="text-xs font-black tracking-wide uppercase text-indigo-350">Analisis Anomali Mingguan</h3>
-              </div>
-              <span className="px-2 py-0.5 rounded-full bg-indigo-500/25 border border-indigo-400/20 text-[9px] font-black text-indigo-300 uppercase tracking-wider">
-                Unusual Spendings
-              </span>
-            </div>
-            
-            <p className="text-[11px] text-slate-300 leading-relaxed">
-              Kami mendeteksi <span className="text-indigo-200 font-extrabold">{unusualSpendings.length} transaksi tidak biasa</span> minggu ini yang jauh melebihi rata-rata pengeluaran harian Anda:
-            </p>
-
-            <div className="space-y-2 mt-1">
-              {unusualSpendings.slice(0, 2).map(tx => {
-                const cat = CATEGORIES.find(c => c.id === tx.categoryId);
-                return (
-                  <div key={tx.id} className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.07] transition-all flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`w-7.5 h-7.5 rounded-lg ${cat?.color || 'bg-slate-800 text-slate-400'} flex items-center justify-center flex-shrink-0 text-xs`}>
-                        {cat && <DynamicIcon name={cat.icon} size={13} />}
-                      </div>
-                      <div className="min-w-0">
-                        <h4 className="text-[11.5px] font-bold text-white truncate">{tx.title}</h4>
-                        <span className="text-[9.5px] text-slate-400 block mt-0.5">{formatShortDate(tx.date)}</span>
-                      </div>
-                    </div>
-                    <div className="text-right flex-shrink-0 pl-1">
-                      <span className="text-[11.5px] font-black text-rose-300 block">-{formatRupiah(tx.amount)}</span>
-                      <span className="text-[8.5px] font-bold text-indigo-400 uppercase tracking-wide">
-                        {tx.amount >= 500000 ? 'Skala Besar 🚨' : 'Lonjakan 2x ⚡'}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <p className="text-[9.5px] text-slate-400 italic leading-snug pt-1">
-              💡 Tip: Batasi pembelian impulsif berskala besar di luar anggaran bulanan untuk mengamankan rasio tabungan mingguan Anda.
-            </p>
+      {/* Dynamic Slideable Insights Carousel (Anomaly & Budget Overruns) */}
+      {carouselSlides.length > 0 && (
+        <div className="relative group overflow-hidden">
+          {/* Active Insight Card */}
+          <div className="transition-all duration-500 ease-in-out">
+            {carouselSlides[activeSlide].element}
           </div>
+
+          {/* Indicator Dots for slide control */}
+          {carouselSlides.length > 1 && (
+            <div className="absolute bottom-2.5 right-4 flex gap-1.5 z-20">
+              {carouselSlides.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setActiveSlide(idx)}
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                    activeSlide === idx 
+                      ? 'bg-white w-3' 
+                      : 'bg-white/45 hover:bg-white/70'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
 
