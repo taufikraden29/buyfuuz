@@ -42,6 +42,34 @@ export default function HomeTab({
   const currentBalance = totalIncome - totalExpense;
   const savingRate = totalIncome > 0 ? ((totalIncome - totalExpense) / totalIncome) * 100 : 0;
 
+  // Weekly Unusual Spendings Anomaly Detection helper
+  const getUnusualSpendings = () => {
+    const expenseTxs = transactions.filter(t => t.type === 'expense');
+    if (expenseTxs.length < 3) return []; // need baseline data points to establish standard deviation
+
+    const totalAmt = expenseTxs.reduce((sum, t) => sum + t.amount, 0);
+    const avgAmt = totalAmt / expenseTxs.length;
+
+    // Filter transactions in the last 7 days (current week)
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    const recentExpenses = expenseTxs.filter(t => {
+      const tDate = new Date(t.date);
+      return tDate >= sevenDaysAgo && tDate <= today;
+    });
+
+    // Unusual if it exceeds 2.0x baseline average AND is greater than Rp 100k, OR is single huge purchase >= Rp 500k
+    const unusual = recentExpenses.filter(t => 
+      (t.amount > avgAmt * 2.0 && t.amount > 100000) || t.amount >= 500000
+    );
+
+    return unusual.sort((a, b) => b.amount - a.amount);
+  };
+
+  const unusualSpendings = getUnusualSpendings();
+
   // Insights helper
   const getInsights = () => {
     const activeBudgets = budgets.filter(b => b.limit > 0);
@@ -301,6 +329,61 @@ export default function HomeTab({
           </div>
         )}
       </div>
+
+      {/* Analisis Mingguan: Pengeluaran Tidak Biasa */}
+      {unusualSpendings.length > 0 && (
+        <div className="p-4 rounded-[22px] bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 border border-indigo-850/30 text-white shadow-md relative overflow-hidden animate-scale-in">
+          <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/10 rounded-full translate-x-12 -translate-y-12 blur-xl"></div>
+          <div className="absolute -left-4 -bottom-4 w-16 h-16 bg-purple-500/10 rounded-full blur-md"></div>
+          
+          <div className="relative z-10 space-y-3">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className="w-6.5 h-6.5 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                  <Sparkles size={13} className="animate-pulse" />
+                </div>
+                <h3 className="text-xs font-black tracking-wide uppercase text-indigo-350">Analisis Anomali Mingguan</h3>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-indigo-500/25 border border-indigo-400/20 text-[9px] font-black text-indigo-300 uppercase tracking-wider">
+                Unusual Spendings
+              </span>
+            </div>
+            
+            <p className="text-[11px] text-slate-300 leading-relaxed">
+              Kami mendeteksi <span className="text-indigo-200 font-extrabold">{unusualSpendings.length} transaksi tidak biasa</span> minggu ini yang jauh melebihi rata-rata pengeluaran harian Anda:
+            </p>
+
+            <div className="space-y-2 mt-1">
+              {unusualSpendings.slice(0, 2).map(tx => {
+                const cat = CATEGORIES.find(c => c.id === tx.categoryId);
+                return (
+                  <div key={tx.id} className="p-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.07] transition-all flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className={`w-7.5 h-7.5 rounded-lg ${cat?.color || 'bg-slate-800 text-slate-400'} flex items-center justify-center flex-shrink-0 text-xs`}>
+                        {cat && <DynamicIcon name={cat.icon} size={13} />}
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-[11.5px] font-bold text-white truncate">{tx.title}</h4>
+                        <span className="text-[9.5px] text-slate-400 block mt-0.5">{formatShortDate(tx.date)}</span>
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0 pl-1">
+                      <span className="text-[11.5px] font-black text-rose-300 block">-{formatRupiah(tx.amount)}</span>
+                      <span className="text-[8.5px] font-bold text-indigo-400 uppercase tracking-wide">
+                        {tx.amount >= 500000 ? 'Skala Besar 🚨' : 'Lonjakan 2x ⚡'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <p className="text-[9.5px] text-slate-400 italic leading-snug pt-1">
+              💡 Tip: Batasi pembelian impulsif berskala besar di luar anggaran bulanan untuk mengamankan rasio tabungan mingguan Anda.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Quick Budgets Overviews */}
       <div className="space-y-2.5">
