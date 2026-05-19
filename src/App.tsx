@@ -16,7 +16,8 @@ import {
   BarChart3,
   Target,
   Calendar,
-  ChevronRight
+  ChevronRight,
+  Copy
 } from 'lucide-react';
 import { api, CATEGORIES } from './services/api';
 import DynamicIcon from './components/DynamicIcon';
@@ -1063,9 +1064,22 @@ export default function App() {
 
                       <div className="flex justify-between items-center py-1 border-b border-slate-50">
                         <span className="text-slate-400">Nominal Uang</span>
-                        <span className={`font-black text-sm ${selectedTxDetail.type === 'income' ? 'text-emerald-600' : 'text-slate-800'}`}>
-                          {selectedTxDetail.type === 'income' ? '+' : '-'}{formatRupiah(selectedTxDetail.amount)}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-black text-sm ${selectedTxDetail.type === 'income' ? 'text-emerald-600' : 'text-slate-800'}`}>
+                            {selectedTxDetail.type === 'income' ? '+' : '-'}{formatRupiah(selectedTxDetail.amount)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(selectedTxDetail.amount.toString());
+                              showToast('Nominal transaksi berhasil disalin! 📋', 'success');
+                            }}
+                            className="p-1 rounded-md bg-slate-50 hover:bg-slate-100 hover:text-indigo-600 text-slate-400 transition-all active:scale-90 cursor-pointer flex items-center justify-center"
+                            title="Salin Nominal Transaksi"
+                          >
+                            <Copy size={11} strokeWidth={2.5} />
+                          </button>
+                        </div>
                       </div>
 
                       <div className="flex justify-between items-center py-1 border-b border-slate-50">
@@ -1447,7 +1461,20 @@ export default function App() {
 
                 <div className="flex justify-between items-center py-1 border-b border-slate-50">
                   <span className="text-slate-400 font-semibold">Nominal Uang</span>
-                  <span className="font-extrabold text-sm text-slate-800">{formatRupiah(selectedBillDetail.amount)}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-extrabold text-sm text-slate-800">{formatRupiah(selectedBillDetail.amount)}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(selectedBillDetail.amount.toString());
+                        showToast('Nominal berhasil disalin! 📋', 'success');
+                      }}
+                      className="p-1 rounded-md bg-slate-50 hover:bg-slate-100 hover:text-indigo-600 text-slate-400 transition-all active:scale-90 cursor-pointer flex items-center justify-center"
+                      title="Salin Nominal"
+                    >
+                      <Copy size={11} strokeWidth={2.5} />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex justify-between items-center py-1 border-b border-slate-50">
@@ -1513,9 +1540,22 @@ export default function App() {
                     </div>
                     <div className="flex justify-between items-center text-[10px] pt-1.5 border-t border-slate-200/50">
                       <span className="text-slate-400 font-bold">Total Pembayaran:</span>
-                      <span className="font-extrabold text-indigo-650 text-xs">
-                        {formatRupiah(selectedBillDetail.amount * drawerPayMonthsCount)}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-extrabold text-indigo-650 text-xs">
+                          {formatRupiah(selectedBillDetail.amount * drawerPayMonthsCount)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText((selectedBillDetail.amount * drawerPayMonthsCount).toString());
+                            showToast('Total nominal berhasil disalin! 📋', 'success');
+                          }}
+                          className="p-0.5 rounded-md hover:bg-slate-100/50 hover:text-indigo-650 text-slate-455 transition-all active:scale-90 cursor-pointer flex items-center justify-center"
+                          title="Salin Total Pembayaran"
+                        >
+                          <Copy size={10} strokeWidth={2.5} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
