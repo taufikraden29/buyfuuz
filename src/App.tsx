@@ -586,6 +586,15 @@ export default function App() {
         {/* MODAL 1: ADD TRANSACTION */}
         {showAddTxModal && (
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            {/* Floating Close Button above the card */}
+            <button
+              type="button"
+              onClick={() => setShowAddTxModal(false)}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 text-white flex items-center justify-center shadow-lg transition-all active:scale-90 z-55 cursor-pointer"
+              title="Tutup"
+            >
+              <X size={18} strokeWidth={2.5} />
+            </button>
             <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -750,6 +759,15 @@ export default function App() {
         {/* MODAL 2: ADD SAVINGS GOAL */}
         {showAddGoalModal && (
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            {/* Floating Close Button above the card */}
+            <button
+              type="button"
+              onClick={() => setShowAddGoalModal(false)}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 text-white flex items-center justify-center shadow-lg transition-all active:scale-90 z-55 cursor-pointer"
+              title="Tutup"
+            >
+              <X size={18} strokeWidth={2.5} />
+            </button>
             <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -853,6 +871,15 @@ export default function App() {
         {/* MODAL 3: SAVINGS ACTION (ADD/WITHDRAW PROGRESS) */}
         {selectedGoal && (
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            {/* Floating Close Button above the card */}
+            <button
+              type="button"
+              onClick={() => setSelectedGoal(null)}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 text-white flex items-center justify-center shadow-lg transition-all active:scale-90 z-55 cursor-pointer"
+              title="Tutup"
+            >
+              <X size={18} strokeWidth={2.5} />
+            </button>
             <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -918,6 +945,15 @@ export default function App() {
         {/* MODAL 4: DEVELOPER SETTINGS MODAL */}
         {showSettingsModal && (
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            {/* Floating Close Button above the card */}
+            <button
+              type="button"
+              onClick={() => setShowSettingsModal(false)}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 text-white flex items-center justify-center shadow-lg transition-all active:scale-90 z-55 cursor-pointer"
+              title="Tutup"
+            >
+              <X size={18} strokeWidth={2.5} />
+            </button>
             <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -988,6 +1024,15 @@ export default function App() {
         {/* MODAL 5: TRANSACTION DETAIL DRAWER */}
         {selectedTxDetail && (
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            {/* Floating Close Button above the card */}
+            <button
+              type="button"
+              onClick={() => setSelectedTxDetail(null)}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 text-white flex items-center justify-center shadow-lg transition-all active:scale-90 z-55 cursor-pointer"
+              title="Tutup"
+            >
+              <X size={18} strokeWidth={2.5} />
+            </button>
             <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -1074,6 +1119,18 @@ export default function App() {
         {/* MODAL 6: ADD BILL */}
         {showAddBillModal && (
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            {/* Floating Close Button above the card */}
+            <button
+              type="button"
+              onClick={() => {
+                setShowAddBillModal(false);
+                resetBillForm();
+              }}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 text-white flex items-center justify-center shadow-lg transition-all active:scale-90 z-55 cursor-pointer"
+              title="Tutup"
+            >
+              <X size={18} strokeWidth={2.5} />
+            </button>
             <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -1348,6 +1405,15 @@ export default function App() {
         {/* DRAWER: BILL DETAIL */}
         {selectedBillDetail && (
           <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            {/* Floating Close Button above the card */}
+            <button
+              type="button"
+              onClick={() => setSelectedBillDetail(null)}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 rounded-full bg-slate-900/60 backdrop-blur-md hover:bg-slate-900/80 text-white flex items-center justify-center shadow-lg transition-all active:scale-90 z-55 cursor-pointer"
+              title="Tutup"
+            >
+              <X size={18} strokeWidth={2.5} />
+            </button>
             <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
