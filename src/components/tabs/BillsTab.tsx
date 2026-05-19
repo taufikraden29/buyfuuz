@@ -20,11 +20,23 @@ export default function BillsTab({
   // Calculations
   const totalUnpaidDebt = bills
     .filter(b => b.type === 'debt' && b.status === 'unpaid')
-    .reduce((sum, b) => sum + b.amount, 0);
+    .reduce((sum, b) => {
+      if (b.isInstallment && b.installmentCount && b.installmentNumber) {
+        const remaining = b.installmentCount - b.installmentNumber + 1;
+        return sum + (remaining * b.amount);
+      }
+      return sum + b.amount;
+    }, 0);
 
   const totalUnpaidReceivable = bills
     .filter(b => b.type === 'receivable' && b.status === 'unpaid')
-    .reduce((sum, b) => sum + b.amount, 0);
+    .reduce((sum, b) => {
+      if (b.isInstallment && b.installmentCount && b.installmentNumber) {
+        const remaining = b.installmentCount - b.installmentNumber + 1;
+        return sum + (remaining * b.amount);
+      }
+      return sum + b.amount;
+    }, 0);
 
   const filteredBills = bills.filter(b => {
     if (billFilter === 'all') return true;
@@ -49,7 +61,13 @@ export default function BillsTab({
 
   const totalReceivableUnpaid = bills
     .filter(b => b.type === 'receivable' && b.status === 'unpaid')
-    .reduce((sum, b) => sum + b.amount, 0);
+    .reduce((sum, b) => {
+      if (b.isInstallment && b.installmentCount && b.installmentNumber) {
+        const remaining = b.installmentCount - b.installmentNumber + 1;
+        return sum + (remaining * b.amount);
+      }
+      return sum + b.amount;
+    }, 0);
 
   const totalReceivablePaid = bills
     .filter(b => b.type === 'receivable' && b.status === 'paid')
@@ -62,7 +80,13 @@ export default function BillsTab({
 
   const totalDebtUnpaid = bills
     .filter(b => b.type === 'debt' && b.status === 'unpaid')
-    .reduce((sum, b) => sum + b.amount, 0);
+    .reduce((sum, b) => {
+      if (b.isInstallment && b.installmentCount && b.installmentNumber) {
+        const remaining = b.installmentCount - b.installmentNumber + 1;
+        return sum + (remaining * b.amount);
+      }
+      return sum + b.amount;
+    }, 0);
 
   const totalDebtPaid = bills
     .filter(b => b.type === 'debt' && b.status === 'paid')
