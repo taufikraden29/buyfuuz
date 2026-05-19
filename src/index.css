@@ -55,24 +55,24 @@ html, body {
   background-color: #f8fafc;
   font-family: var(--font-sans);
   color: #334155;
-  min-height: 100vh;
-  min-height: -webkit-fill-available; /* Fix iOS mobile viewport height bug */
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* Lock window-level scrolling completely */
 }
 
 body {
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow-x: hidden;
 }
 
 #root {
   width: 100%;
-  min-height: 100vh;
-  min-height: -webkit-fill-available;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
 /* Base style resets */
