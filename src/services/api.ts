@@ -15,10 +15,18 @@ export const CATEGORIES: Category[] = [
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const getNextMonthDate = (dateStr: string): string => {
-  const [yearStr, monthStr, dayStr] = dateStr.split('-');
+  // Extract clean YYYY-MM-DD part to ignore any times or timezone suffixes
+  const cleanDateStr = (dateStr || '').slice(0, 10);
+  const [yearStr, monthStr, dayStr] = cleanDateStr.split('-');
   let year = Number(yearStr);
   let month = Number(monthStr); // 1-12
   let day = Number(dayStr);
+  
+  if (isNaN(year) || isNaN(month) || isNaN(day)) {
+    const fallback = new Date();
+    fallback.setMonth(fallback.getMonth() + 1);
+    return fallback.toISOString().split('T')[0];
+  }
   
   // Advance month
   month += 1;
@@ -278,7 +286,7 @@ export const api = {
     const oldStatus = bills[idx].status;
     bills[idx].status = status;
     
-    // Automation: once marked PAID from UNPAID status
+    // Automation 1: once marked PAID from UNPAID status
     if (status === 'paid' && oldStatus === 'unpaid') {
       if (bills[idx].isRecurring) {
         const nextDueDate = getNextMonthDate(bills[idx].dueDate);
@@ -348,6 +356,75 @@ export const api = {
       };
       transactions.unshift(newTransaction);
       setStorageItem('finance_transactions', transactions);
+    }
+    
+    // Automation 2: Rollback when status is set back to UNPAID from PAID (tidak jadi dilunasi)
+    else if (status === 'unpaid' && oldStatus === 'paid') {
+      const originalTitle = bills[idx].title;
+      const originalAmount = bills[idx].amount;
+
+      // 1. Rollback recurring bill
+      if (bills[idx].isRecurring) {
+        // Find and delete the next generated recurring bill
+        const nextDueDate = getNextMonthDate(bills[idx].dueDate);
+        const nextBillIdx = bills.findIndex(b => 
+          b.title === bills[idx].title && 
+          b.type === bills[idx].type && 
+          b.dueDate === nextDueDate && 
+          b.status === 'unpaid' && 
+          b.isRecurring
+        );
+        if (nextBillIdx !== -1) {
+          bills.splice(nextBillIdx, 1);
+        }
+      } 
+      // 2. Rollback installment bill
+      else if (bills[idx].isInstallment && bills[idx].installmentNumber && bills[idx].installmentCount) {
+        const currentNum = bills[idx].installmentNumber!;
+        const totalCount = bills[idx].installmentCount!;
+        
+        // Parse current title to see how many months were paid
+        const titleMatch = bills[idx].title.match(/\(Cicilan\s+(\d+)-(\d+)\/(\d+)\)$/i);
+        let paidMonthsCount = 1;
+        let singleAmount = bills[idx].amount;
+        
+        if (titleMatch) {
+          const startNum = Number(titleMatch[1]);
+          const endNum = Number(titleMatch[2]);
+          paidMonthsCount = endNum - startNum + 1;
+          singleAmount = bills[idx].amount / paidMonthsCount;
+        }
+        
+        const baseTitle = bills[idx].title.replace(/\s*\(Cicilan\s+\d+(?:-\d+)?\/\d+\)$/i, '');
+        
+        // Revert current bill's amount & title
+        bills[idx].amount = singleAmount;
+        bills[idx].title = `${baseTitle} (Cicilan ${currentNum}/${totalCount})`;
+        
+        // Find and delete the next generated unpaid installment bill
+        const nextNumber = currentNum + paidMonthsCount;
+        const nextBillIdx = bills.findIndex(b => 
+          b.parentBillId === bills[idx].parentBillId && 
+          b.installmentNumber === nextNumber && 
+          b.status === 'unpaid'
+        );
+        if (nextBillIdx !== -1) {
+          bills.splice(nextBillIdx, 1);
+        }
+      }
+
+      // 3. Rollback the corresponding Transaction
+      const transactions = getStorageItem<Transaction[]>('finance_transactions', []);
+      const txIdx = transactions.findIndex(t => 
+        (t.title === originalTitle || t.title.startsWith(originalTitle.replace(/\s*\(Cicilan\s+.*$/i, ''))) &&
+        t.amount === originalAmount &&
+        t.categoryId === (bills[idx].type === 'debt' ? 'cat-tagihan' : 'cat-lainnya') &&
+        t.notes === `Pelunasan otomatis dari menu Tagihan & Piutang`
+      );
+      if (txIdx !== -1) {
+        transactions.splice(txIdx, 1);
+        setStorageItem('finance_transactions', transactions);
+      }
     }
     
     setStorageItem('finance_bills', bills);
