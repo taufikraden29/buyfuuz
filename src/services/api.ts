@@ -361,7 +361,6 @@ export const api = {
     // Automation 2: Rollback when status is set back to UNPAID from PAID (tidak jadi dilunasi)
     else if (status === 'unpaid' && oldStatus === 'paid') {
       const originalTitle = bills[idx].title;
-      const originalAmount = bills[idx].amount;
 
       // 1. Rollback recurring bill
       if (bills[idx].isRecurring) {
@@ -417,8 +416,6 @@ export const api = {
       const transactions = getStorageItem<Transaction[]>('finance_transactions', []);
       const txIdx = transactions.findIndex(t => 
         (t.title === originalTitle || t.title.startsWith(originalTitle.replace(/\s*\(Cicilan\s+.*$/i, ''))) &&
-        t.amount === originalAmount &&
-        t.categoryId === (bills[idx].type === 'debt' ? 'cat-tagihan' : 'cat-lainnya') &&
         t.notes === `Pelunasan otomatis dari menu Tagihan & Piutang`
       );
       if (txIdx !== -1) {
