@@ -49,17 +49,30 @@
   background: rgba(148, 163, 184, 0.4);
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
-  background-color: #f1f5f9;
+  background-color: #f8fafc;
   font-family: var(--font-sans);
   color: #334155;
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* Fix iOS mobile viewport height bug */
+}
+
+body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
   overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Base style resets */

@@ -411,7 +411,7 @@ export default function App() {
       )}
 
       {/* Main Responsive Web Container */}
-      <div className="w-full max-w-2xl mx-auto h-dvh bg-[#fafaff] sm:shadow-xl sm:border-x sm:border-slate-100 flex flex-col relative">
+      <div className="w-full sm:max-w-md mx-auto h-dvh sm:h-[90vh] bg-[#fafaff] sm:rounded-[36px] sm:shadow-2xl sm:border sm:border-slate-100/80 flex flex-col relative overflow-hidden sm:my-8">
 
 
         {/* Dynamic Screen View Container */}
@@ -586,8 +586,8 @@ export default function App() {
 
         {/* MODAL 1: ADD TRANSACTION */}
         {showAddTxModal && (
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs flex items-end justify-center z-40 animate-fade-in">
-            <div className="w-full bg-white rounded-t-[28px] p-5 space-y-4 shadow-xl border-t border-slate-100 max-h-[90%] overflow-y-auto animate-slide-up">
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div>
@@ -750,8 +750,8 @@ export default function App() {
 
         {/* MODAL 2: ADD SAVINGS GOAL */}
         {showAddGoalModal && (
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs flex items-end justify-center z-40">
-            <div className="w-full bg-white rounded-t-[28px] p-5 space-y-4 shadow-xl border-t border-slate-100 animate-slide-up">
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div>
@@ -853,8 +853,8 @@ export default function App() {
 
         {/* MODAL 3: SAVINGS ACTION (ADD/WITHDRAW PROGRESS) */}
         {selectedGoal && (
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs flex items-end justify-center z-40">
-            <div className="w-full bg-white rounded-t-[28px] p-5 space-y-4 shadow-xl border-t border-slate-100 animate-slide-up">
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div>
@@ -918,8 +918,8 @@ export default function App() {
 
         {/* MODAL 4: DEVELOPER SETTINGS MODAL */}
         {showSettingsModal && (
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs flex items-end justify-center z-45">
-            <div className="w-full bg-white rounded-t-[28px] p-5 space-y-4 shadow-xl border-t border-slate-100 animate-slide-up">
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div>
@@ -988,8 +988,8 @@ export default function App() {
 
         {/* MODAL 5: TRANSACTION DETAIL DRAWER */}
         {selectedTxDetail && (
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs flex items-end justify-center z-40">
-            <div className="w-full bg-white rounded-t-[28px] p-5 space-y-4 shadow-xl border-t border-slate-100 animate-slide-up">
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div>
@@ -1074,8 +1074,8 @@ export default function App() {
 
         {/* MODAL 6: ADD BILL */}
         {showAddBillModal && (
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs flex items-end justify-center z-45 animate-fade-in">
-            <div className="w-full bg-white rounded-t-[28px] p-5 space-y-4 shadow-xl border-t border-slate-100 max-h-[90%] overflow-y-auto animate-slide-up">
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div>
@@ -1326,8 +1326,8 @@ export default function App() {
 
         {/* DRAWER: BILL DETAIL */}
         {selectedBillDetail && (
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-xs flex items-end justify-center z-45 animate-fade-in">
-            <div className="w-full bg-white rounded-t-[28px] p-5 space-y-4 shadow-xl border-t border-slate-100 animate-slide-up max-h-[85%] overflow-y-auto">
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-end justify-center z-50 p-0 sm:p-4 animate-fade-in">
+            <div className="w-full sm:max-w-md bg-white rounded-t-[28px] sm:rounded-2xl p-5 space-y-4 shadow-2xl border-t sm:border border-slate-100/80 max-h-[92vh] sm:max-h-[82vh] overflow-y-auto animate-slide-up sm:my-auto">
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div>
