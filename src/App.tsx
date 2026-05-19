@@ -413,77 +413,76 @@ export default function App() {
       {/* Main Responsive Web Container */}
       <div className="w-full sm:max-w-md mx-auto h-dvh sm:h-[90vh] bg-[#fafaff] sm:rounded-[36px] sm:shadow-2xl sm:border sm:border-slate-100/80 flex flex-col relative overflow-hidden sm:my-8">
 
-
-        {/* Dynamic Screen View Container */}
-        <div className="flex-1 overflow-y-auto px-4 pb-24 pt-4 scroll-smooth">
-          
-          {/* HEADER */}
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9.5 h-9.5 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
-                {currentTab === 'home' && <Coins className="text-indigo-500 animate-float" size={19} />}
-                {currentTab === 'transactions' && <Receipt className="text-indigo-500 animate-float" size={19} />}
-                {currentTab === 'budgets' && <BarChart3 className="text-indigo-500 animate-float" size={19} />}
-                {currentTab === 'bills' && <Wallet className="text-indigo-500 animate-float" size={19} />}
-                {currentTab === 'goals' && <Target className="text-indigo-500 animate-float" size={19} />}
-              </div>
-              <div>
-                <h1 className="text-[15px] font-extrabold text-slate-800 leading-tight">
-                  {currentTab === 'home' && 'UangKu'}
-                  {currentTab === 'transactions' && 'Riwayat Transaksi'}
-                  {currentTab === 'budgets' && 'Anggaran Bulanan'}
-                  {currentTab === 'bills' && 'Tagihan & Piutang'}
-                  {currentTab === 'goals' && 'Target Tabungan'}
-                </h1>
-                <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium">
-                  {currentTab === 'home' && 'Pencatat Finansial Pribadi'}
-                  {currentTab === 'transactions' && 'Temukan dan atur pengeluaran Anda'}
-                  {currentTab === 'budgets' && 'Bantu kontrol pengeluaran per kategori'}
-                  {currentTab === 'bills' && 'Pantau hutang piutang jatuh tempo'}
-                  {currentTab === 'goals' && 'Rencanakan masa depan keuangan Anda'}
-                </p>
-              </div>
+        {/* FIXED HEADER TOPBAR */}
+        <div className="bg-white/80 backdrop-blur-md border-b border-slate-100/80 px-4 py-3 flex justify-between items-center z-30 flex-shrink-0">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
+              {currentTab === 'home' && <Coins className="text-indigo-500 animate-float" size={18} />}
+              {currentTab === 'transactions' && <Receipt className="text-indigo-500 animate-float" size={18} />}
+              {currentTab === 'budgets' && <BarChart3 className="text-indigo-500 animate-float" size={18} />}
+              {currentTab === 'bills' && <Wallet className="text-indigo-500 animate-float" size={18} />}
+              {currentTab === 'goals' && <Target className="text-indigo-500 animate-float" size={18} />}
             </div>
-            
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={() => setShowSettingsModal(true)}
-                className="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 active:scale-95 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all cursor-pointer flex-shrink-0"
-                title="Pilihan Developer / Reset"
-              >
-                <Settings size={15} />
-              </button>
-
-              {currentTab === 'bills' ? (
-                <button 
-                  onClick={() => setShowAddBillModal(true)}
-                  className="px-3.5 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white text-xs font-bold flex items-center gap-1 shadow-md shadow-indigo-150 transition-all cursor-pointer flex-shrink-0"
-                >
-                  <Plus size={13} strokeWidth={2.5} />
-                  <span>Tagihan</span>
-                </button>
-              ) : currentTab === 'goals' ? (
-                <button 
-                  onClick={() => setShowAddGoalModal(true)}
-                  className="px-3.5 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white text-xs font-bold flex items-center gap-1 shadow-md shadow-indigo-150 transition-all cursor-pointer flex-shrink-0"
-                >
-                  <Plus size={13} strokeWidth={2.5} />
-                  <span>Target</span>
-                </button>
-              ) : (
-                <button 
-                  onClick={() => {
-                    resetTxForm();
-                    setShowAddTxModal(true);
-                  }}
-                  className="px-3.5 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white text-xs font-bold flex items-center gap-1 shadow-md shadow-indigo-150 transition-all cursor-pointer flex-shrink-0"
-                >
-                  <Plus size={13} strokeWidth={2.5} />
-                  <span>Transaksi</span>
-                </button>
-              )}
+            <div>
+              <h1 className="text-[14px] font-extrabold text-slate-800 leading-tight">
+                {currentTab === 'home' && 'UangKu'}
+                {currentTab === 'transactions' && 'Riwayat Transaksi'}
+                {currentTab === 'budgets' && 'Anggaran Bulanan'}
+                {currentTab === 'bills' && 'Tagihan & Piutang'}
+                {currentTab === 'goals' && 'Target Tabungan'}
+              </h1>
+              <p className="text-[10px] text-slate-400 font-medium">
+                {currentTab === 'home' && 'Pencatat Finansial Pribadi'}
+                {currentTab === 'transactions' && 'Temukan dan atur pengeluaran Anda'}
+                {currentTab === 'budgets' && 'Bantu kontrol pengeluaran per kategori'}
+                {currentTab === 'bills' && 'Pantau hutang piutang jatuh tempo'}
+                {currentTab === 'goals' && 'Rencanakan masa depan keuangan Anda'}
+              </p>
             </div>
           </div>
+          
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setShowSettingsModal(true)}
+              className="w-7.5 h-7.5 rounded-full bg-slate-50 hover:bg-slate-100 active:scale-95 flex items-center justify-center text-slate-450 hover:text-slate-600 transition-all cursor-pointer flex-shrink-0"
+              title="Pengaturan Developer / Reset"
+            >
+              <Settings size={14} />
+            </button>
+
+            {currentTab === 'bills' ? (
+              <button 
+                onClick={() => setShowAddBillModal(true)}
+                className="px-3 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white text-[10.5px] font-bold flex items-center gap-1 shadow-md shadow-indigo-150 transition-all cursor-pointer flex-shrink-0"
+              >
+                <Plus size={12} strokeWidth={2.5} />
+                <span>Tagihan</span>
+              </button>
+            ) : currentTab === 'goals' ? (
+              <button 
+                onClick={() => setShowAddGoalModal(true)}
+                className="px-3 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white text-[10.5px] font-bold flex items-center gap-1 shadow-md shadow-indigo-150 transition-all cursor-pointer flex-shrink-0"
+              >
+                <Plus size={12} strokeWidth={2.5} />
+                <span>Target</span>
+              </button>
+            ) : (
+              <button 
+                onClick={() => {
+                  resetTxForm();
+                  setShowAddTxModal(true);
+                }}
+                className="px-3 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white text-[10.5px] font-bold flex items-center gap-1 shadow-md shadow-indigo-150 transition-all cursor-pointer flex-shrink-0"
+              >
+                <Plus size={12} strokeWidth={2.5} />
+                <span>Transaksi</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* SCROLLABLE MAIN CONTENT AREA */}
+        <div className="flex-1 overflow-y-auto px-4 pt-4 pb-[calc(76px+env(safe-area-inset-bottom,0px))] scroll-smooth">
 
           {/* TAB 1: HOME/DASHBOARD */}
           {currentTab === 'home' && (
