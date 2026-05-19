@@ -47,6 +47,19 @@ export default function BillsTab({
     .filter(b => b.type === 'debt' && b.status === 'unpaid' && b.dueDate.startsWith(currentMonthYear))
     .reduce((sum, b) => sum + b.amount, 0);
 
+  const totalReceivableUnpaid = bills
+    .filter(b => b.type === 'receivable' && b.status === 'unpaid')
+    .reduce((sum, b) => sum + b.amount, 0);
+
+  const totalReceivablePaid = bills
+    .filter(b => b.type === 'receivable' && b.status === 'paid')
+    .reduce((sum, b) => sum + b.amount, 0);
+
+  const totalReceivableAll = totalReceivableUnpaid + totalReceivablePaid;
+  const receivableCollectedPercent = totalReceivableAll > 0 
+    ? Math.round((totalReceivablePaid / totalReceivableAll) * 100) 
+    : 0;
+
   return (
     <div className="space-y-4 animate-slide-up">
 
@@ -70,6 +83,58 @@ export default function BillsTab({
           <p className="text-[10px] font-bold text-emerald-500/80">Harus segera ditagih</p>
         </div>
       </div>
+
+      {/* Card Perhitungan Total Piutang */}
+      {(billFilter === 'receivable' || billFilter === 'all') && (
+        <div className="p-4 rounded-[22px] bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white shadow-md relative overflow-hidden animate-scale-in">
+          {/* Background decorative blobs */}
+          <div className="absolute right-0 top-0 w-28 h-28 bg-white/10 rounded-full translate-x-8 -translate-y-8 blur-lg"></div>
+          <div className="absolute -left-4 -bottom-4 w-16 h-16 bg-emerald-500/20 rounded-full blur-md"></div>
+          
+          <div className="relative z-10 space-y-3">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className="w-6.5 h-6.5 rounded-lg bg-white/20 text-white flex items-center justify-center">
+                  <Coins size={13} className="animate-pulse" />
+                </div>
+                <h3 className="text-xs font-black tracking-wide uppercase text-emerald-100">Kalkulasi Hak Piutang</h3>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-white/20 border border-white/10 text-[9px] font-black uppercase tracking-wider">
+                Receivables Summary
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-center pt-1">
+              <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs">
+                <span className="text-[9px] font-bold text-emerald-200 block uppercase">Belum Lunas</span>
+                <span className="text-[11px] font-extrabold text-white block mt-0.5">{formatRupiah(totalReceivableUnpaid)}</span>
+              </div>
+              <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs">
+                <span className="text-[9px] font-bold text-emerald-200 block uppercase">Sudah Cair</span>
+                <span className="text-[11px] font-extrabold text-emerald-100 block mt-0.5">{formatRupiah(totalReceivablePaid)}</span>
+              </div>
+              <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs">
+                <span className="text-[9px] font-bold text-emerald-200 block uppercase">Total Piutang</span>
+                <span className="text-[11px] font-extrabold text-white block mt-0.5">{formatRupiah(totalReceivableAll)}</span>
+              </div>
+            </div>
+
+            {/* Progress Bar showing collected ratio */}
+            <div className="space-y-1.5 pt-1">
+              <div className="flex justify-between text-[10px] font-bold text-emerald-100">
+                <span>Persentase Piutang Tertagih (Lunas)</span>
+                <span>{receivableCollectedPercent}%</span>
+              </div>
+              <div className="w-full bg-white/20 h-1.5 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-white rounded-full transition-all duration-500"
+                  style={{ width: `${receivableCollectedPercent}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Monthly Focus Alert Card */}
       <div className="p-3.5 bg-gradient-to-r from-indigo-500/[0.03] to-purple-500/[0.03] border border-indigo-100/50 rounded-2xl flex items-center justify-between gap-3 shadow-3xs">
