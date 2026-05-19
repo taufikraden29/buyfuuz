@@ -164,7 +164,7 @@ export default function HomeTab({
         <div className="absolute left-0 bottom-0 w-24 h-24 bg-purple-500/20 rounded-full -translate-x-6 translate-y-6 blur-lg"></div>
 
         <div className="relative z-10">
-          <span className="text-[11px] font-medium tracking-wide uppercase opacity-75">Total Saldo Anda</span>
+          <span className="text-xs font-semibold tracking-wide uppercase opacity-85">Total Saldo Anda</span>
           <h2 className="text-2xl font-bold mt-1 tracking-tight">
             {loadingTxs ? (
               <span className="inline-block w-40 h-8 bg-white/20 animate-pulse rounded"></span>
@@ -179,7 +179,7 @@ export default function HomeTab({
                 <ArrowUpRight size={16} className="text-emerald-300" />
               </div>
               <div>
-                <span className="text-[10px] text-white/70 block uppercase">Pemasukan</span>
+                <span className="text-xs text-white/80 block uppercase tracking-wide">Pemasukan</span>
                 <span className="text-xs font-bold block">
                   {loadingTxs ? (
                     <span className="inline-block w-16 h-4 bg-white/20 animate-pulse rounded"></span>
@@ -195,7 +195,7 @@ export default function HomeTab({
                 <ArrowDownRight size={16} className="text-rose-300" />
               </div>
               <div>
-                <span className="text-[10px] text-white/70 block uppercase">Pengeluaran</span>
+                <span className="text-xs text-white/80 block uppercase tracking-wide">Pengeluaran</span>
                 <span className="text-xs font-bold block text-rose-100">
                   {loadingTxs ? (
                     <span className="inline-block w-16 h-4 bg-white/20 animate-pulse rounded"></span>
@@ -216,7 +216,7 @@ export default function HomeTab({
         </div>
         <div>
           <h4 className="text-xs font-bold text-slate-800">{insight.title}</h4>
-          <p className="text-[10px] text-slate-600 mt-1 leading-relaxed">{insight.message}</p>
+          <p className="text-[11px] sm:text-xs text-slate-600 mt-1.5 leading-relaxed">{insight.message}</p>
         </div>
       </div>
 
@@ -224,10 +224,10 @@ export default function HomeTab({
       <div className="p-4 rounded-[22px] bg-white border border-slate-100 shadow-xs">
         <div className="flex justify-between items-center mb-3">
           <div>
-            <h3 className="text-[13px] font-bold text-slate-800">Tren Pengeluaran</h3>
-            <p className="text-[10px] text-slate-400">Analisis pengeluaran 7 hari terakhir</p>
+            <h3 className="text-sm font-bold text-slate-800">Tren Pengeluaran</h3>
+            <p className="text-xs text-slate-400">Analisis pengeluaran 7 hari terakhir</p>
           </div>
-          <div className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-500 text-[10px] font-bold">
+          <div className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-500 text-xs font-bold">
             Grafik Mingguan
           </div>
         </div>
@@ -291,8 +291,8 @@ export default function HomeTab({
             <div className="flex justify-between px-2 mt-1">
               {chartData.map((d, idx) => (
                 <div key={idx} className="text-center w-[40px]">
-                  <span className="text-[9px] font-semibold text-slate-400 block">{d.day}</span>
-                  <span className="text-[7.5px] font-bold text-slate-600 block truncate">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400 block">{d.day}</span>
+                  <span className="text-[10px] font-bold text-slate-600 block truncate">
                     {d.amount > 0 ? (d.amount >= 1000 ? `${Math.round(d.amount/1000)}k` : d.amount) : '-'}
                   </span>
                 </div>
@@ -305,10 +305,10 @@ export default function HomeTab({
       {/* Quick Budgets Overviews */}
       <div className="space-y-2.5">
         <div className="flex justify-between items-center">
-          <h3 className="text-[13px] font-bold text-slate-800">Status Anggaran</h3>
+          <h3 className="text-sm font-bold text-slate-800">Status Anggaran</h3>
           <button 
             onClick={() => setCurrentTab('budgets')} 
-            className="text-[11px] font-semibold text-indigo-500 hover:text-indigo-600 flex items-center"
+            className="text-xs font-bold text-indigo-500 hover:text-indigo-600 flex items-center"
           >
             <span>Semua</span>
             <ChevronRight size={12} />
@@ -340,14 +340,14 @@ export default function HomeTab({
                     </div>
                     <div className="min-w-0">
                       <h4 className="text-xs font-bold text-slate-700 truncate">{cat?.name}</h4>
-                      <span className="text-[9px] text-slate-400">
+                      <span className="text-[11px] text-slate-400">
                         {formatRupiah(b.spent)} dari {formatRupiah(b.limit)}
                       </span>
                     </div>
                   </div>
 
                   <div className="w-1/3 flex flex-col items-end gap-1">
-                    <span className={`text-[10px] font-bold ${isNearLimit ? 'text-rose-500' : 'text-slate-500'}`}>
+                    <span className={`text-xs font-bold ${isNearLimit ? 'text-rose-500' : 'text-slate-500'}`}>
                       {percent}%
                     </span>
                     <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
@@ -367,10 +367,10 @@ export default function HomeTab({
       {/* Recent Transactions */}
       <div className="space-y-2.5">
         <div className="flex justify-between items-center">
-          <h3 className="text-[13px] font-bold text-slate-800">Transaksi Terakhir</h3>
+          <h3 className="text-sm font-bold text-slate-800">Transaksi Terakhir</h3>
           <button 
             onClick={() => setCurrentTab('transactions')} 
-            className="text-[11px] font-semibold text-indigo-500 hover:text-indigo-600 flex items-center"
+            className="text-xs font-bold text-indigo-500 hover:text-indigo-600 flex items-center"
           >
             <span>Lihat Riwayat</span>
             <ChevronRight size={12} />
@@ -405,7 +405,7 @@ export default function HomeTab({
                     </div>
                     <div className="min-w-0">
                       <h4 className="text-xs font-bold text-slate-700 truncate">{tx.title}</h4>
-                      <p className="text-[9px] text-slate-400 mt-0.5">
+                      <p className="text-[11px] text-slate-400 mt-0.5">
                         {formatShortDate(tx.date)} {tx.notes && `• ${tx.notes}`}
                       </p>
                     </div>
@@ -415,7 +415,7 @@ export default function HomeTab({
                     <span className={`text-xs font-bold block ${tx.type === 'income' ? 'text-emerald-500' : 'text-slate-700'}`}>
                       {tx.type === 'income' ? '+' : '-'}{formatRupiah(tx.amount)}
                     </span>
-                    <span className="text-[8.5px] font-semibold text-slate-400 block uppercase">
+                    <span className="text-[10px] font-bold text-slate-400 block uppercase">
                       {cat?.name}
                     </span>
                   </div>

@@ -420,33 +420,68 @@ export default function App() {
           {/* HEADER */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center">
-                <Coins className="text-indigo-500 animate-float" size={19} />
+              <div className="w-9.5 h-9.5 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                {currentTab === 'home' && <Coins className="text-indigo-500 animate-float" size={19} />}
+                {currentTab === 'transactions' && <Receipt className="text-indigo-500 animate-float" size={19} />}
+                {currentTab === 'budgets' && <BarChart3 className="text-indigo-500 animate-float" size={19} />}
+                {currentTab === 'bills' && <Wallet className="text-indigo-500 animate-float" size={19} />}
+                {currentTab === 'goals' && <Target className="text-indigo-500 animate-float" size={19} />}
               </div>
               <div>
-                <h1 className="text-[17px] font-bold text-slate-800 leading-tight">UangKu</h1>
-                <p className="text-[11px] text-slate-400">Pencatat Finansial Pribadi</p>
+                <h1 className="text-[15px] font-extrabold text-slate-800 leading-tight">
+                  {currentTab === 'home' && 'UangKu'}
+                  {currentTab === 'transactions' && 'Riwayat Transaksi'}
+                  {currentTab === 'budgets' && 'Anggaran Bulanan'}
+                  {currentTab === 'bills' && 'Tagihan & Piutang'}
+                  {currentTab === 'goals' && 'Target Tabungan'}
+                </h1>
+                <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium">
+                  {currentTab === 'home' && 'Pencatat Finansial Pribadi'}
+                  {currentTab === 'transactions' && 'Temukan dan atur pengeluaran Anda'}
+                  {currentTab === 'budgets' && 'Bantu kontrol pengeluaran per kategori'}
+                  {currentTab === 'bills' && 'Pantau hutang piutang jatuh tempo'}
+                  {currentTab === 'goals' && 'Rencanakan masa depan keuangan Anda'}
+                </p>
               </div>
             </div>
             
             <div className="flex items-center gap-2">
               <button 
                 onClick={() => setShowSettingsModal(true)}
-                className="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 active:scale-95 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all cursor-pointer"
+                className="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 active:scale-95 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all cursor-pointer flex-shrink-0"
                 title="Pilihan Developer / Reset"
               >
                 <Settings size={15} />
               </button>
-              <button 
-                onClick={() => {
-                  resetTxForm();
-                  setShowAddTxModal(true);
-                }}
-                className="px-3.5 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white text-xs font-semibold flex items-center gap-1 shadow-md shadow-indigo-200 transition-all cursor-pointer"
-              >
-                <Plus size={14} strokeWidth={2.5} />
-                <span>Transaksi</span>
-              </button>
+
+              {currentTab === 'bills' ? (
+                <button 
+                  onClick={() => setShowAddBillModal(true)}
+                  className="px-3.5 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white text-xs font-bold flex items-center gap-1 shadow-md shadow-indigo-150 transition-all cursor-pointer flex-shrink-0"
+                >
+                  <Plus size={13} strokeWidth={2.5} />
+                  <span>Tagihan</span>
+                </button>
+              ) : currentTab === 'goals' ? (
+                <button 
+                  onClick={() => setShowAddGoalModal(true)}
+                  className="px-3.5 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white text-xs font-bold flex items-center gap-1 shadow-md shadow-indigo-150 transition-all cursor-pointer flex-shrink-0"
+                >
+                  <Plus size={13} strokeWidth={2.5} />
+                  <span>Target</span>
+                </button>
+              ) : (
+                <button 
+                  onClick={() => {
+                    resetTxForm();
+                    setShowAddTxModal(true);
+                  }}
+                  className="px-3.5 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white text-xs font-bold flex items-center gap-1 shadow-md shadow-indigo-150 transition-all cursor-pointer flex-shrink-0"
+                >
+                  <Plus size={13} strokeWidth={2.5} />
+                  <span>Transaksi</span>
+                </button>
+              )}
             </div>
           </div>
 
@@ -488,7 +523,6 @@ export default function App() {
               setSelectedGoal={setSelectedGoal}
               setFundType={setFundType}
               setFundAmount={setFundAmount}
-              setShowAddGoalModal={setShowAddGoalModal}
               openConfirm={openConfirm}
               onDeleteGoal={(id) => deleteGoalMutation.mutate(id)}
             />
@@ -500,7 +534,6 @@ export default function App() {
               bills={bills}
               loadingBills={loadingBills}
               setSelectedBillDetail={setSelectedBillDetail}
-              setShowAddBillModal={setShowAddBillModal}
             />
           )}
 
@@ -511,42 +544,42 @@ export default function App() {
           
           <button 
             onClick={() => setCurrentTab('home')}
-            className={`flex flex-col items-center gap-1 cursor-pointer transition-all ${currentTab === 'home' ? 'text-indigo-500 scale-105' : 'text-slate-400 hover:text-slate-500'}`}
+            className={`flex flex-col items-center gap-1 cursor-pointer transition-all ${currentTab === 'home' ? 'text-indigo-650 scale-105 animate-pulse-slow' : 'text-slate-450 hover:text-slate-600'}`}
           >
-            <Home size={18} strokeWidth={currentTab === 'home' ? 2.5 : 2} />
-            <span className="text-[9px] font-bold">Ringkasan</span>
+            <Home size={20} strokeWidth={currentTab === 'home' ? 2.5 : 2} />
+            <span className="text-[10.5px] font-extrabold tracking-wide">Ringkasan</span>
           </button>
 
           <button 
             onClick={() => setCurrentTab('transactions')}
-            className={`flex flex-col items-center gap-1 cursor-pointer transition-all ${currentTab === 'transactions' ? 'text-indigo-500 scale-105' : 'text-slate-400 hover:text-slate-500'}`}
+            className={`flex flex-col items-center gap-1 cursor-pointer transition-all ${currentTab === 'transactions' ? 'text-indigo-650 scale-105 animate-pulse-slow' : 'text-slate-450 hover:text-slate-600'}`}
           >
-            <Receipt size={18} strokeWidth={currentTab === 'transactions' ? 2.5 : 2} />
-            <span className="text-[9px] font-bold">Riwayat</span>
+            <Receipt size={20} strokeWidth={currentTab === 'transactions' ? 2.5 : 2} />
+            <span className="text-[10.5px] font-extrabold tracking-wide">Riwayat</span>
           </button>
 
           <button 
             onClick={() => setCurrentTab('budgets')}
-            className={`flex flex-col items-center gap-1 cursor-pointer transition-all ${currentTab === 'budgets' ? 'text-indigo-500 scale-105' : 'text-slate-400 hover:text-slate-500'}`}
+            className={`flex flex-col items-center gap-1 cursor-pointer transition-all ${currentTab === 'budgets' ? 'text-indigo-650 scale-105 animate-pulse-slow' : 'text-slate-450 hover:text-slate-600'}`}
           >
-            <BarChart3 size={18} strokeWidth={currentTab === 'budgets' ? 2.5 : 2} />
-            <span className="text-[9px] font-bold">Anggaran</span>
+            <BarChart3 size={20} strokeWidth={currentTab === 'budgets' ? 2.5 : 2} />
+            <span className="text-[10.5px] font-extrabold tracking-wide">Anggaran</span>
           </button>
 
           <button 
             onClick={() => setCurrentTab('bills')}
-            className={`flex flex-col items-center gap-1 cursor-pointer transition-all ${currentTab === 'bills' ? 'text-indigo-500 scale-105' : 'text-slate-400 hover:text-slate-500'}`}
+            className={`flex flex-col items-center gap-1 cursor-pointer transition-all ${currentTab === 'bills' ? 'text-indigo-650 scale-105 animate-pulse-slow' : 'text-slate-450 hover:text-slate-600'}`}
           >
-            <Wallet size={18} strokeWidth={currentTab === 'bills' ? 2.5 : 2} />
-            <span className="text-[9px] font-bold">Tagihan</span>
+            <Wallet size={20} strokeWidth={currentTab === 'bills' ? 2.5 : 2} />
+            <span className="text-[10.5px] font-extrabold tracking-wide">Tagihan</span>
           </button>
 
           <button 
             onClick={() => setCurrentTab('goals')}
-            className={`flex flex-col items-center gap-1 cursor-pointer transition-all ${currentTab === 'goals' ? 'text-indigo-500 scale-105' : 'text-slate-400 hover:text-slate-500'}`}
+            className={`flex flex-col items-center gap-1 cursor-pointer transition-all ${currentTab === 'goals' ? 'text-indigo-650 scale-105 animate-pulse-slow' : 'text-slate-450 hover:text-slate-600'}`}
           >
-            <Target size={18} strokeWidth={currentTab === 'goals' ? 2.5 : 2} />
-            <span className="text-[9px] font-bold">Target</span>
+            <Target size={20} strokeWidth={currentTab === 'goals' ? 2.5 : 2} />
+            <span className="text-[10.5px] font-extrabold tracking-wide">Target</span>
           </button>
 
         </div>
@@ -558,8 +591,8 @@ export default function App() {
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-800">Catat Transaksi Baru</h3>
-                  <p className="text-[10px] text-slate-400">Atur uang masuk dan keluar dengan cermat</p>
+                  <h3 className="text-sm font-extrabold text-slate-800">Catat Transaksi Baru</h3>
+                  <p className="text-xs text-slate-400">Atur uang masuk dan keluar dengan cermat</p>
                 </div>
                 <button 
                   onClick={() => setShowAddTxModal(false)}
@@ -604,21 +637,21 @@ export default function App() {
 
                 {/* Amount Input */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Jumlah Uang</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Jumlah Uang</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
                     <input
-                      type="number"
-                      required
-                      placeholder="0"
-                      value={txAmount}
-                      onChange={(e) => setTxAmount(e.target.value)}
-                      className="w-full bg-slate-50 hover:bg-slate-100/50 focus:bg-white text-xs pl-9 pr-3 py-2.5 rounded-xl border border-slate-100 focus:border-indigo-200 transition-colors font-bold text-slate-700"
+                       type="number"
+                       required
+                       placeholder="0"
+                       value={txAmount}
+                       onChange={(e) => setTxAmount(e.target.value)}
+                       className="w-full bg-slate-50 hover:bg-slate-100/50 focus:bg-white text-xs pl-9 pr-3 py-2.5 rounded-xl border border-slate-100 focus:border-indigo-200 transition-colors font-bold text-slate-700"
                     />
                   </div>
                   {/* Dynamic Rupiah Preview */}
                   {txAmount && (
-                    <div className="text-[10px] text-indigo-500 font-bold mt-1 text-right animate-scale-in">
+                    <div className="text-xs text-indigo-500 font-bold mt-1 text-right animate-scale-in">
                       Format: {getLivePreviewText(txAmount)}
                     </div>
                   )}
@@ -626,7 +659,7 @@ export default function App() {
 
                 {/* Title Input */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Judul / Keperluan</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Judul / Keperluan</label>
                   <input
                     type="text"
                     required
@@ -642,7 +675,7 @@ export default function App() {
                         type="button"
                         key={tpl}
                         onClick={() => setTxTitle(tpl)}
-                        className="px-2 py-1 rounded-lg bg-indigo-50/50 hover:bg-indigo-50 border border-indigo-100/40 text-[9px] font-bold text-indigo-600 transition-all cursor-pointer hover:scale-102 active:scale-95"
+                        className="px-2.5 py-1 rounded-lg bg-indigo-50/50 hover:bg-indigo-50 border border-indigo-100/40 text-[11px] font-bold text-indigo-650 transition-all cursor-pointer hover:scale-102 active:scale-95"
                       >
                         {tpl}
                       </button>
@@ -652,7 +685,7 @@ export default function App() {
 
                 {/* Category Grid Picker */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1.5 uppercase tracking-wide">Kategori</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1.5 uppercase tracking-wider">Kategori</label>
                   <div className="grid grid-cols-3 gap-2">
                     {CATEGORIES.filter(c => txType === 'income' ? c.type === 'income' || c.type === 'both' : c.type === 'expense' || c.type === 'both').map(c => (
                       <button
@@ -665,10 +698,10 @@ export default function App() {
                             : 'bg-white border-slate-100 hover:bg-slate-50/50'
                         }`}
                       >
-                        <div className={`w-7 h-7 rounded-lg ${c.color} flex items-center justify-center`}>
-                          <DynamicIcon name={c.icon} size={14} />
+                        <div className={`w-8.5 h-8.5 rounded-lg ${c.color} flex items-center justify-center flex-shrink-0`}>
+                          <DynamicIcon name={c.icon} size={15} />
                         </div>
-                        <span className="text-[9px] font-bold text-slate-600 truncate max-w-full">{c.name}</span>
+                        <span className="text-[11px] font-bold text-slate-650 truncate max-w-full">{c.name}</span>
                       </button>
                     ))}
                   </div>
@@ -676,7 +709,7 @@ export default function App() {
 
                 {/* Date Input */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Tanggal</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Tanggal</label>
                   <div className="relative">
                     <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
@@ -691,7 +724,7 @@ export default function App() {
 
                 {/* Notes Input */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Catatan Tambahan (Opsional)</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Catatan Tambahan (Opsional)</label>
                   <textarea
                     placeholder="Tambahkan detail catatan kecil..."
                     value={txNotes}
@@ -722,8 +755,8 @@ export default function App() {
               
               <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div>
-                  <h3 className="text-sm font-bold text-slate-800">Buat Target Tabungan</h3>
-                  <p className="text-[10px] text-slate-400">Sisihkan dana untuk mimpi Anda</p>
+                  <h3 className="text-sm font-extrabold text-slate-800">Buat Target Tabungan</h3>
+                  <p className="text-xs text-slate-400">Sisihkan dana untuk mimpi Anda</p>
                 </div>
                 <button 
                   onClick={() => setShowAddGoalModal(false)}
@@ -736,7 +769,7 @@ export default function App() {
               <form onSubmit={handleAddGoalSubmit} className="space-y-4">
                 {/* Title */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Nama Target / Rencana</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Nama Target / Rencana</label>
                   <input
                     type="text"
                     required
@@ -752,7 +785,7 @@ export default function App() {
                         type="button"
                         key={tpl}
                         onClick={() => setGoalTitle(tpl)}
-                        className="px-2 py-1 rounded-lg bg-indigo-50/50 hover:bg-indigo-50 border border-indigo-100/40 text-[9px] font-bold text-indigo-600 transition-all cursor-pointer hover:scale-102 active:scale-95"
+                        className="px-2.5 py-1 rounded-lg bg-indigo-50/50 hover:bg-indigo-50 border border-indigo-100/40 text-[11px] font-bold text-indigo-650 transition-all cursor-pointer hover:scale-102 active:scale-95"
                       >
                         {tpl}
                       </button>
@@ -762,7 +795,7 @@ export default function App() {
 
                 {/* Target Amount */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Target Nominal</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Target Nominal</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
                     <input
@@ -776,7 +809,7 @@ export default function App() {
                   </div>
                   {/* Dynamic Preview */}
                   {goalTarget && (
-                    <div className="text-[10px] text-indigo-500 font-bold mt-1 text-right animate-scale-in">
+                    <div className="text-xs text-indigo-550 font-bold mt-1 text-right animate-scale-in">
                       Format: {getLivePreviewText(goalTarget)}
                     </div>
                   )}
@@ -784,7 +817,7 @@ export default function App() {
 
                 {/* Color Selector */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-2 uppercase tracking-wide">Pilih Warna Aksen</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-2 uppercase tracking-wider">Pilih Warna Aksen</label>
                   <div className="flex gap-3">
                     {[
                       { class: 'bg-emerald-500', name: 'Emerald' },
@@ -828,7 +861,7 @@ export default function App() {
                   <h3 className="text-sm font-bold text-slate-800">
                     {fundType === 'add' ? 'Tabung Uang' : 'Tarik Uang'}
                   </h3>
-                  <p className="text-[10px] text-slate-400">Target: {selectedGoal.title}</p>
+                  <p className="text-xs text-slate-400">Target: {selectedGoal.title}</p>
                 </div>
                 <button 
                   onClick={() => setSelectedGoal(null)}
@@ -840,7 +873,7 @@ export default function App() {
 
               <form onSubmit={handleGoalFundSubmit} className="space-y-4">
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Nominal Uang</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Nominal Uang</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">Rp</span>
                     <input
@@ -854,12 +887,12 @@ export default function App() {
                   </div>
                   {/* Dynamic Preview */}
                   {fundAmount && (
-                    <div className="text-[10px] text-indigo-500 font-bold mt-1 text-right animate-scale-in">
+                    <div className="text-xs text-indigo-500 font-bold mt-1 text-right animate-scale-in">
                       Format: {getLivePreviewText(fundAmount)}
                     </div>
                   )}
-                  <p className="text-[9px] text-slate-400 mt-1.5">
-                    Saldo tabungan saat ini: <span className="font-bold text-slate-600">{formatRupiah(selectedGoal.currentAmount)}</span>
+                  <p className="text-xs text-slate-400 mt-1.5">
+                    Saldo tabungan saat ini: <span className="font-bold text-slate-650">{formatRupiah(selectedGoal.currentAmount)}</span>
                   </p>
                 </div>
 
@@ -1107,7 +1140,7 @@ export default function App() {
 
                 {/* Contact Name */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Nama Kontak (Orang / Lembaga)</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Nama Kontak (Orang / Lembaga)</label>
                   <input 
                     type="text"
                     required
@@ -1120,14 +1153,14 @@ export default function App() {
 
                 {/* Title Templates Chips */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-bold text-slate-400 block uppercase tracking-wide">Template Judul</label>
+                  <label className="text-xs font-semibold text-slate-400 block uppercase tracking-wider">Template Judul</label>
                   <div className="flex flex-wrap gap-1.5">
                     {BILL_TEMPLATES[billType].map(t => (
                       <button
                         key={t}
                         type="button"
                         onClick={() => setBillTitle(t)}
-                        className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border cursor-pointer ${
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border cursor-pointer ${
                           billTitle === t
                             ? 'bg-indigo-50 border-indigo-100 text-indigo-600 font-extrabold shadow-2xs'
                             : 'bg-slate-50 hover:bg-slate-100/50 border-slate-100 text-slate-500'
@@ -1141,7 +1174,7 @@ export default function App() {
 
                 {/* Title Input */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Keterangan / Deskripsi</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Keterangan / Deskripsi</label>
                   <input 
                     type="text"
                     required
@@ -1154,7 +1187,7 @@ export default function App() {
 
                 {/* Amount Input */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Jumlah Nominal</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Jumlah Nominal</label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Rp</span>
                     <input 
@@ -1169,7 +1202,7 @@ export default function App() {
                   </div>
                   {/* Live Rupiah Preview */}
                   {billAmount && (
-                    <span className="text-[10px] text-indigo-500 font-extrabold mt-1 block px-1 animate-scale-in">
+                    <span className="text-xs text-indigo-550 font-extrabold mt-1 block px-1 animate-scale-in">
                       {getLivePreviewText(billAmount)}
                     </span>
                   )}
@@ -1177,7 +1210,7 @@ export default function App() {
 
                 {/* Due Date */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Tanggal Jatuh Tempo</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Tanggal Jatuh Tempo</label>
                   <input 
                     type="date"
                     required
@@ -1192,7 +1225,7 @@ export default function App() {
                   <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100/70">
                     <div>
                       <span className="text-xs font-bold text-slate-700 block">Ulangi Setiap Bulan</span>
-                      <span className="text-[9px] text-slate-400">Tagihan baru otomatis terbit untuk bulan depan setelah lunas</span>
+                      <span className="text-[11px] text-slate-400">Tagihan baru otomatis terbit untuk bulan depan setelah lunas</span>
                     </div>
                     <button
                       type="button"
@@ -1216,7 +1249,7 @@ export default function App() {
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="text-xs font-bold text-slate-700 block">Angsuran / Cicilan (Paylater)</span>
-                        <span className="text-[9px] text-slate-400">Pecah nominal menjadi beberapa cicilan bulanan</span>
+                        <span className="text-[11px] text-slate-400">Pecah nominal menjadi beberapa cicilan bulanan</span>
                       </div>
                       <button
                         type="button"
@@ -1236,7 +1269,7 @@ export default function App() {
                     {billIsInstallment && (
                       <div className="pt-2 border-t border-slate-200/50 space-y-2 animate-scale-in">
                         <div>
-                          <label className="text-[9px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Jumlah Angsuran (Bulan)</label>
+                          <label className="text-[11px] font-bold text-slate-400 block mb-1.5 uppercase tracking-wider">Jumlah Angsuran (Bulan)</label>
                           <div className="grid grid-cols-4 gap-1.5">
                             {['3', '6', '12', '24'].map(months => (
                               <button
@@ -1255,7 +1288,7 @@ export default function App() {
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between text-[10px] text-slate-550 pt-1.5">
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1.5">
                           <span>Estimasi Angsuran / Bulan:</span>
                           <span className="font-extrabold text-indigo-600">
                             {billAmount ? formatRupiah(Math.round(Number(billAmount) / Number(billInstallmentsCount))) : 'Rp 0'}
@@ -1268,7 +1301,7 @@ export default function App() {
 
                 {/* Notes */}
                 <div>
-                  <label className="text-[10px] font-bold text-slate-400 block mb-1 uppercase tracking-wide">Catatan Tambahan (Opsional)</label>
+                  <label className="text-xs font-semibold text-slate-400 block mb-1 uppercase tracking-wider">Catatan Tambahan (Opsional)</label>
                   <textarea 
                     placeholder="Tulis detail tambahan jika diperlukan..."
                     value={billNotes}

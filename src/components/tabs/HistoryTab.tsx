@@ -88,13 +88,8 @@ export default function HistoryTab({
 
   return (
     <div className="space-y-4 animate-slide-up">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-base font-bold text-slate-800">Riwayat Transaksi</h2>
-          <p className="text-[11px] text-slate-400">Temukan dan atur pengeluaran Anda</p>
-        </div>
-        {/* View Switcher: Daftar vs Kalender */}
-        <div className="flex bg-slate-100 p-0.5 rounded-xl text-[9px] font-extrabold w-32 border border-slate-200/20">
+      <div className="flex justify-end mb-1">
+        <div className="flex bg-slate-100 p-0.5 rounded-xl text-xs font-bold w-32 border border-slate-200/20">
           <button
             type="button"
             onClick={() => {
@@ -149,14 +144,14 @@ export default function HistoryTab({
 
         {/* Periode Bulanan Selector */}
         <div className="space-y-1">
-          <label className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider block">Periode Bulanan</label>
+          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Periode Bulanan</label>
           <select
             value={selectedMonthFilter}
             onChange={(e) => {
               setSelectedMonthFilter(e.target.value);
               setSelectedCalendarDay(null);
             }}
-            className="w-full bg-slate-50 hover:bg-slate-100/50 focus:bg-white text-[11px] px-2.5 py-2 rounded-xl border border-slate-100 focus:border-indigo-100 transition-colors font-bold text-slate-600 cursor-pointer"
+            className="w-full bg-slate-50 hover:bg-slate-100/50 focus:bg-white text-xs px-2.5 py-2 rounded-xl border border-slate-100 focus:border-indigo-100 transition-colors font-bold text-slate-600 cursor-pointer"
           >
             <option value="all">Semua Bulan (Tampilan Kronologis)</option>
             {uniqueMonths.map(m => {
@@ -170,11 +165,11 @@ export default function HistoryTab({
 
         {/* Horizontal Category Filtering Row */}
         <div className="space-y-1">
-          <label className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider block">Pilih Kategori</label>
+          <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Pilih Kategori</label>
           <div className="flex gap-1.5 overflow-x-auto pb-1.5 scroll-smooth no-scrollbar -mx-3.5 px-3.5">
             <button
               onClick={() => setTxCategoryFilter('all')}
-              className={`px-3 py-1.5 rounded-full text-[10px] font-bold shrink-0 transition-all border cursor-pointer ${
+              className={`px-3 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all border cursor-pointer ${
                 txCategoryFilter === 'all'
                   ? 'bg-indigo-500 border-indigo-500 text-white shadow-xs'
                   : 'bg-white border-slate-100 text-slate-500 hover:bg-slate-50'
@@ -186,7 +181,7 @@ export default function HistoryTab({
               <button
                 key={c.id}
                 onClick={() => setTxCategoryFilter(c.id)}
-                className={`px-3 py-1.5 rounded-full text-[10px] font-bold shrink-0 transition-all border flex items-center gap-1 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all border flex items-center gap-1 cursor-pointer ${
                   txCategoryFilter === c.id
                     ? 'bg-indigo-500 border-indigo-500 text-white shadow-xs'
                     : 'bg-white border-slate-100 text-slate-500 hover:bg-slate-50'
@@ -206,7 +201,7 @@ export default function HistoryTab({
               key={type}
               type="button"
               onClick={() => setTxTypeFilter(type)}
-              className={`py-1 text-[10px] font-bold rounded-lg cursor-pointer transition-all ${
+              className={`py-1 text-xs font-bold rounded-lg cursor-pointer transition-all ${
                 txTypeFilter === type 
                   ? 'bg-white text-indigo-600 shadow-xs' 
                   : 'text-slate-500 hover:text-slate-700'
@@ -224,20 +219,20 @@ export default function HistoryTab({
       {viewMode === 'calendar' && (
         <div className="p-3.5 bg-white border border-slate-100 rounded-[20px] shadow-2xs space-y-3.5 animate-scale-in">
           <div className="flex justify-between items-center px-1">
-            <span className="text-[11px] font-extrabold text-slate-800 uppercase tracking-wide">
+            <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">
               {new Date(calYear, calMonth, 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}
             </span>
             {selectedCalendarDay && (
               <button
                 onClick={() => setSelectedCalendarDay(null)}
-                className="text-[9px] font-bold text-indigo-500 hover:underline cursor-pointer"
+                className="text-xs font-bold text-indigo-500 hover:underline cursor-pointer"
               >
                 Tampilkan Semua Hari
               </button>
             )}
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center text-[9px] font-extrabold text-slate-400 uppercase tracking-wider">
+          <div className="grid grid-cols-7 gap-1 text-center text-xs font-extrabold text-slate-400 uppercase tracking-wider">
             <div>Sn</div>
             <div>Sl</div>
             <div>Rb</div>
@@ -269,15 +264,15 @@ export default function HistoryTab({
                       : 'bg-slate-50/50 border-slate-100 hover:bg-slate-50 text-slate-700'
                   }`}
                 >
-                  <span className={`text-[10px] font-extrabold ${isSelected ? 'text-white' : 'text-slate-700'}`}>{cell.day}</span>
+                  <span className={`text-xs font-extrabold ${isSelected ? 'text-white' : 'text-slate-700'}`}>{cell.day}</span>
                   <div className="w-full text-center space-y-0.5">
                     {dayIncome > 0 && (
-                      <span className={`text-[6.5px] font-black block leading-tight ${isSelected ? 'text-emerald-200' : 'text-emerald-600'}`}>
+                      <span className={`text-[8.5px] font-black block leading-tight ${isSelected ? 'text-emerald-200' : 'text-emerald-600'}`}>
                         +{formatCalendarAmt(dayIncome)}
                       </span>
                     )}
                     {dayExpense > 0 && (
-                      <span className={`text-[6.5px] font-black block leading-tight ${isSelected ? 'text-rose-200' : 'text-rose-500'}`}>
+                      <span className={`text-[8.5px] font-black block leading-tight ${isSelected ? 'text-rose-200' : 'text-rose-500'}`}>
                         -{formatCalendarAmt(dayExpense)}
                       </span>
                     )}
@@ -301,7 +296,7 @@ export default function HistoryTab({
           <div className="p-8 bg-white border border-slate-100 rounded-[20px] text-center">
             <HelpCircle className="mx-auto text-slate-300 mb-2 animate-bounce" size={26} />
             <p className="text-xs text-slate-500 font-bold">Tidak ada transaksi ditemukan</p>
-            <p className="text-[10px] text-slate-400 mt-0.5">Coba ubah kata kunci pencarian atau filter.</p>
+            <p className="text-xs text-slate-400 mt-0.5">Coba ubah kata kunci pencarian atau filter.</p>
           </div>
         ) : (
           <div className="space-y-5">
@@ -313,7 +308,7 @@ export default function HistoryTab({
                     <span className="w-1.5 h-3 bg-indigo-500 rounded-full"></span>
                     {group.monthYear}
                   </h3>
-                  <div className="flex gap-1 text-[8px] font-extrabold">
+                  <div className="flex gap-1 text-[10px] font-extrabold">
                     {group.income > 0 && (
                       <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 border border-emerald-100/30">
                         +{formatRupiah(group.income)}
@@ -343,7 +338,7 @@ export default function HistoryTab({
                           </div>
                           <div className="min-w-0">
                             <h4 className="text-xs font-bold text-slate-700 truncate">{tx.title}</h4>
-                            <p className="text-[9px] text-slate-400 mt-0.5">
+                            <p className="text-[11px] text-slate-400 mt-0.5">
                               {formatShortDate(tx.date)} {tx.notes && `• ${tx.notes}`}
                             </p>
                           </div>
@@ -353,7 +348,7 @@ export default function HistoryTab({
                           <span className={`text-xs font-bold block ${tx.type === 'income' ? 'text-emerald-500' : 'text-slate-700'}`}>
                             {tx.type === 'income' ? '+' : '-'}{formatRupiah(tx.amount)}
                           </span>
-                          <span className="text-[8px] font-bold text-slate-400 uppercase">
+                          <span className="text-[10px] font-bold text-slate-400 uppercase">
                             {cat?.name}
                           </span>
                         </div>
@@ -375,7 +370,7 @@ export default function HistoryTab({
                 : `Semua Transaksi Bulan Ini`
               }
             </h3>
-            <span className="text-[10px] font-bold text-slate-400">
+            <span className="text-xs font-bold text-slate-400">
               {calendarFilteredTransactions.length} Transaksi
             </span>
           </div>
@@ -390,7 +385,7 @@ export default function HistoryTab({
             <div className="p-8 bg-white border border-slate-100 rounded-[20px] text-center">
               <HelpCircle className="mx-auto text-slate-300 mb-2 animate-bounce" size={26} />
               <p className="text-xs text-slate-500 font-bold">Tidak ada transaksi ditemukan</p>
-              <p className="text-[10px] text-slate-400 mt-0.5">Coba ubah kata kunci pencarian atau filter.</p>
+              <p className="text-xs text-slate-400 mt-0.5">Coba ubah kata kunci pencarian atau filter.</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -408,7 +403,7 @@ export default function HistoryTab({
                       </div>
                       <div className="min-w-0">
                         <h4 className="text-xs font-bold text-slate-700 truncate">{tx.title}</h4>
-                        <p className="text-[9px] text-slate-400 mt-0.5">
+                        <p className="text-[11px] text-slate-400 mt-0.5">
                           {formatShortDate(tx.date)} {tx.notes && `• ${tx.notes}`}
                         </p>
                       </div>
@@ -418,7 +413,7 @@ export default function HistoryTab({
                       <span className={`text-xs font-bold block ${tx.type === 'income' ? 'text-emerald-500' : 'text-slate-700'}`}>
                         {tx.type === 'income' ? '+' : '-'}{formatRupiah(tx.amount)}
                       </span>
-                      <span className="text-[8px] font-bold text-slate-400 uppercase">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase">
                         {cat?.name}
                       </span>
                     </div>

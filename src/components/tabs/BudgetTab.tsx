@@ -26,15 +26,6 @@ export default function BudgetTab({
 
   return (
     <div className="space-y-4 animate-slide-up">
-      <div className="flex justify-between items-start">
-        <div>
-          <h2 className="text-base font-bold text-slate-800">Anggaran Bulanan</h2>
-          <p className="text-[11px] text-slate-400">Kendalikan batas pengeluaran kategori</p>
-        </div>
-        <div className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-500 text-[10px] font-bold">
-          Bulan Ini
-        </div>
-      </div>
 
       {loadingBudgets ? (
         <div className="space-y-3">
@@ -43,7 +34,7 @@ export default function BudgetTab({
           ))}
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           {CATEGORIES.filter(c => c.type === 'expense' || c.type === 'both').map(cat => {
             const budget = budgets.find(b => b.categoryId === cat.id);
             const isEditing = editingBudget?.categoryId === cat.id;
@@ -54,68 +45,72 @@ export default function BudgetTab({
             const isNearLimit = percent >= 80;
 
             return (
-              <div key={cat.id} className="p-4 bg-white border border-slate-100 rounded-2xl space-y-3 shadow-2xs">
+              <div key={cat.id} className="p-4 bg-white border border-slate-100 rounded-2xl space-y-3.5 shadow-2xs">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-xl ${cat.color} flex items-center justify-center`}>
-                      <DynamicIcon name={cat.icon} size={15} />
+                    <div className={`w-8.5 h-8.5 rounded-xl ${cat.color} flex items-center justify-center flex-shrink-0`}>
+                      <DynamicIcon name={cat.icon} size={16} />
                     </div>
-                    <h3 className="text-xs font-bold text-slate-700">{cat.name}</h3>
+                    <h3 className="text-xs font-extrabold text-slate-700">{cat.name}</h3>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    {isEditing ? (
-                      <div className="flex items-center gap-1.5">
-                        <div className="relative">
-                          <input
-                            type="number"
-                            placeholder="Limit"
-                            value={editingBudget.limit}
-                            onChange={(e) => setEditingBudget({ ...editingBudget, limit: e.target.value })}
-                            className="w-20 bg-slate-50 text-[10px] px-1.5 py-1 rounded border border-slate-200 font-bold"
-                          />
-                        </div>
-                        <button 
-                          onClick={() => handleBudgetEditSubmit(cat.id)}
-                          className="p-1.5 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 active:scale-95 cursor-pointer flex items-center justify-center"
-                          title="Simpan"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3 h-3">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                          </svg>
-                        </button>
-                        <button 
-                          onClick={() => setEditingBudget(null)}
-                          className="p-1.5 rounded-lg bg-slate-100 text-slate-400 hover:bg-slate-200 active:scale-95 cursor-pointer flex items-center justify-center"
-                          title="Batal"
-                        >
-                          <X size={12} />
-                        </button>
-                      </div>
-                    ) : (
-                      <button 
-                        onClick={() => setEditingBudget({ categoryId: cat.id, limit: limit > 0 ? limit.toString() : '' })}
-                        className="text-[10px] font-semibold text-indigo-500 hover:bg-indigo-50 px-2 py-0.5 rounded transition-colors cursor-pointer"
-                      >
-                        {limit > 0 ? 'Edit Batas' : '+ Atur Batas'}
-                      </button>
-                    )}
-                  </div>
+                  {!isEditing && (
+                    <button 
+                      onClick={() => setEditingBudget({ categoryId: cat.id, limit: limit > 0 ? limit.toString() : '' })}
+                      className="text-xs font-bold text-indigo-500 hover:bg-indigo-50 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                    >
+                      {limit > 0 ? 'Edit Batas' : '+ Atur Batas'}
+                    </button>
+                  )}
                 </div>
 
+                {isEditing && (
+                  <div className="flex items-center justify-between gap-3 bg-slate-50/70 p-2.5 rounded-xl border border-slate-100 animate-scale-in">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Batas:</span>
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">Rp</span>
+                        <input
+                          type="number"
+                          placeholder="Limit"
+                          value={editingBudget.limit}
+                          onChange={(e) => setEditingBudget({ ...editingBudget, limit: e.target.value })}
+                          className="w-32 bg-white text-xs pl-7 pr-2 py-1.5 rounded-lg border border-slate-200 focus:border-indigo-300 font-bold text-slate-700"
+                        />
+                      </div>
+                      <button 
+                        onClick={() => handleBudgetEditSubmit(cat.id)}
+                        className="p-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 active:scale-95 cursor-pointer flex items-center justify-center shadow-xs"
+                        title="Simpan"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                      </button>
+                      <button 
+                        onClick={() => setEditingBudget(null)}
+                        className="p-2 rounded-lg bg-white text-slate-400 border border-slate-200 hover:bg-slate-50 active:scale-95 cursor-pointer flex items-center justify-center"
+                        title="Batal"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {isEditing && editingBudget.limit && (
-                  <div className="text-[9px] text-indigo-500 font-bold text-right -mt-1 animate-scale-in">
-                    Preview: {getLivePreviewText(editingBudget.limit)}
+                  <div className="text-xs text-indigo-500 font-bold text-right -mt-1 animate-scale-in">
+                    Format: {getLivePreviewText(editingBudget.limit)}
                   </div>
                 )}
 
                 {limit > 0 ? (
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     <div className="flex justify-between items-end">
-                      <span className="text-[10px] text-slate-400">
-                        Terpakai: <span className="font-bold text-slate-600">{formatRupiah(spent)}</span>
+                      <span className="text-[11px] text-slate-400">
+                        Terpakai: <span className="font-extrabold text-slate-600">{formatRupiah(spent)}</span>
                       </span>
-                      <span className={`text-[10px] font-bold ${isNearLimit ? 'text-rose-500' : 'text-indigo-500'}`}>
+                      <span className={`text-[11px] font-extrabold ${isNearLimit ? 'text-rose-500' : 'text-indigo-500'}`}>
                         {formatRupiah(limit)} ({percent}%)
                       </span>
                     </div>
@@ -130,20 +125,20 @@ export default function BudgetTab({
                     </div>
 
                     {percent >= 100 ? (
-                      <div className="flex items-center gap-1.5 text-rose-500 bg-rose-50/70 p-1.5 rounded-lg text-[9px] font-semibold">
-                        <AlertCircle size={11} />
-                        <span>Batas anggaran terlampaui! Coba batasi belanja kategori ini.</span>
+                      <div className="flex items-center gap-1.5 text-rose-500 bg-rose-50/70 p-2 rounded-lg text-[11px] font-bold">
+                        <AlertCircle size={12} className="flex-shrink-0" />
+                        <span>Batas anggaran terlampaui! Rem belanja kategori ini.</span>
                       </div>
                     ) : isNearLimit ? (
-                      <div className="flex items-center gap-1.5 text-amber-500 bg-amber-50/70 p-1.5 rounded-lg text-[9px] font-semibold">
-                        <AlertCircle size={11} />
+                      <div className="flex items-center gap-1.5 text-amber-600 bg-amber-50/70 p-2 rounded-lg text-[11px] font-bold">
+                        <AlertCircle size={12} className="flex-shrink-0" />
                         <span>Pengeluaran mendekati batas limit (diatas 80%).</span>
                       </div>
                     ) : null}
                   </div>
                 ) : (
-                  <div className="text-[10px] text-slate-400 bg-slate-50/50 p-2.5 rounded-xl border border-dashed border-slate-200 text-center">
-                    Belum ada batas yang dikonfigurasi untuk kategori ini.
+                  <div className="text-[11px] text-slate-400 bg-slate-50/50 p-3 rounded-xl border border-dashed border-slate-200 text-center">
+                    Belum ada batas anggaran untuk kategori ini.
                   </div>
                 )}
               </div>
