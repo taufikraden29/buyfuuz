@@ -355,10 +355,10 @@ export default function App() {
 
   return (
     // Outer frame device emulator for desktop, standard mobile fit on touch devices
-    <div className="w-full min-h-screen flex items-center justify-center p-0 sm:p-4 md:p-8 bg-slate-100/50">
+    <div className="w-full min-h-screen bg-slate-50/50">
       
       {/* Dynamic Toast System */}
-      <div className="fixed top-6 flex flex-col gap-2 z-55 pointer-events-none max-w-[340px] w-full px-4">
+      <div className="fixed top-6 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-55 pointer-events-none max-w-[340px] w-full px-4">
         {toasts.map(toast => (
           <div 
             key={toast.id}
@@ -410,21 +410,9 @@ export default function App() {
         </div>
       )}
 
-      {/* Device Frame */}
-      <div className="w-full max-w-[420px] h-dvh sm:h-[840px] bg-[#fafaff] sm:rounded-[36px] sm:shadow-2xl overflow-hidden flex flex-col relative border-0 sm:border-8 border-slate-900/10">
-        
-        {/* Device Notch & Status bar mockup */}
-        <div className="hidden sm:flex bg-white/70 backdrop-blur-md justify-between items-center px-6 pt-3 pb-2 text-[11px] font-semibold text-slate-500 z-30 border-b border-slate-100">
-          <span>20:36</span>
-          <div className="w-20 h-4 bg-slate-900/90 rounded-full absolute left-1/2 -translate-x-1/2 top-2"></div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-2 bg-slate-400 rounded-xs"></span>
-            <span className="w-2.5 h-2 bg-slate-400 rounded-xs"></span>
-            <span className="w-4 h-2.5 border border-slate-400 rounded-xs flex items-center p-[1px]">
-              <span className="h-full w-full bg-slate-500 rounded-xs"></span>
-            </span>
-          </div>
-        </div>
+      {/* Main Responsive Web Container */}
+      <div className="w-full max-w-2xl mx-auto h-dvh bg-[#fafaff] sm:shadow-xl sm:border-x sm:border-slate-100 flex flex-col relative">
+
 
         {/* Dynamic Screen View Container */}
         <div className="flex-1 overflow-y-auto px-4 pb-24 pt-4 scroll-smooth">
