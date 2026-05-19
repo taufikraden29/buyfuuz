@@ -411,7 +411,7 @@ export default function App() {
       )}
 
       {/* Device Frame */}
-      <div className="w-full max-w-[420px] h-screen sm:h-[840px] bg-[#fafaff] sm:rounded-[36px] sm:shadow-2xl overflow-hidden flex flex-col relative border-0 sm:border-8 border-slate-900/10">
+      <div className="w-full max-w-[420px] h-dvh sm:h-[840px] bg-[#fafaff] sm:rounded-[36px] sm:shadow-2xl overflow-hidden flex flex-col relative border-0 sm:border-8 border-slate-900/10">
         
         {/* Device Notch & Status bar mockup */}
         <div className="hidden sm:flex bg-white/70 backdrop-blur-md justify-between items-center px-6 pt-3 pb-2 text-[11px] font-semibold text-slate-500 z-30 border-b border-slate-100">
@@ -519,7 +519,7 @@ export default function App() {
         </div>
 
         {/* BOTTOM NAVIGATION TAB BAR */}
-        <div className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-100 py-2.5 px-4 flex justify-around items-center z-30">
+        <div className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t border-slate-100 pt-2.5 pb-[calc(10px+env(safe-area-inset-bottom,0px))] px-4 flex justify-around items-center z-30">
           
           <button 
             onClick={() => setCurrentTab('home')}
