@@ -1266,7 +1266,7 @@ export default function App() {
                     </div>
 
                     {billIsInstallment && (
-                      <div className="pt-2 border-t border-slate-200/50 space-y-2 animate-scale-in">
+                      <div className="pt-2 border-t border-slate-200/50 space-y-3 animate-scale-in">
                         <div>
                           <label className="text-[11px] font-bold text-slate-400 block mb-1.5 uppercase tracking-wider">Jumlah Angsuran (Bulan)</label>
                           <div className="grid grid-cols-4 gap-1.5">
@@ -1285,12 +1285,34 @@ export default function App() {
                               </button>
                             ))}
                           </div>
+
+                          {/* Manual Input for Custom Installments Count */}
+                          <div className="mt-2.5 flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">Atau Isi Manual:</span>
+                            <div className="relative flex-1">
+                              <input
+                                type="number"
+                                min="1"
+                                max="120"
+                                placeholder="Contoh: 5, 8, 10"
+                                value={!['3', '6', '12', '24'].includes(billInstallmentsCount) ? billInstallmentsCount : ''}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setBillInstallmentsCount(val);
+                                }}
+                                className="w-full bg-white hover:bg-slate-50/50 focus:bg-white text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 focus:border-indigo-100 transition-colors font-bold text-slate-700"
+                              />
+                              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400">bulan</span>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1.5">
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-dashed border-slate-100">
                           <span>Estimasi Angsuran / Bulan:</span>
                           <span className="font-extrabold text-indigo-600">
-                            {billAmount ? formatRupiah(Math.round(Number(billAmount) / Number(billInstallmentsCount))) : 'Rp 0'}
+                            {billAmount && Number(billInstallmentsCount) > 0 
+                              ? formatRupiah(Math.round(Number(billAmount) / Number(billInstallmentsCount))) 
+                              : 'Rp 0'}
                           </span>
                         </div>
                       </div>
