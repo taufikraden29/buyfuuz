@@ -12,11 +12,12 @@ import { useState, useEffect } from 'react';
 import { CATEGORIES } from '../../services/api';
 import DynamicIcon from '../DynamicIcon';
 import { formatRupiah, formatShortDate } from '../../utils/financeHelpers';
-import type { Transaction, Budget } from '../../types/finance';
+import type { Transaction, Budget, Account } from '../../types/finance';
 
 interface HomeTabProps {
   transactions: Transaction[];
   budgets: Budget[];
+  accounts: Account[];
   loadingTxs: boolean;
   loadingBudgets: boolean;
   setCurrentTab: (tab: string) => void;
@@ -26,6 +27,7 @@ interface HomeTabProps {
 export default function HomeTab({
   transactions,
   budgets,
+  accounts = [],
   loadingTxs,
   loadingBudgets,
   setCurrentTab,
@@ -42,6 +44,18 @@ export default function HomeTab({
 
   const currentBalance = totalIncome - totalExpense;
   const savingRate = totalIncome > 0 ? ((totalIncome - totalExpense) / totalIncome) * 100 : 0;
+
+  // Calculate balances per account dynamically
+  const getAccountBalances = () => {
+    return accounts.map(acc => {
+      const accountTxs = transactions.filter(t => t.accountId === acc.id || (!t.accountId && acc.id === 'acc-tunai'));
+      const income = accountTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+      const expense = accountTxs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+      return { ...acc, balance: income - expense };
+    });
+  };
+
+  const accountBalances = getAccountBalances();
 
   // Weekly Unusual Spendings Anomaly Detection helper
   const getUnusualSpendings = () => {
@@ -115,9 +129,44 @@ export default function HomeTab({
 
   const budgetAdvice = getBudgetAdvice();
 
-  // Dynamically assemble Carousel slides if anomalies or budget advice exist
+  // --- CALCULATE WEEKLY TRENDS ---
+  const getWeeklyComparisonInsight = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const fourteenDaysAgo = new Date();
+    fourteenDaysAgo.setDate(today.getDate() - 14);
+    fourteenDaysAgo.setHours(0, 0, 0, 0);
+
+    const thisWeek = transactions
+      .filter(t => t.type === 'expense')
+      .filter(t => {
+        const d = new Date(t.date);
+        return d >= sevenDaysAgo && d <= today;
+      })
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    const lastWeek = transactions
+      .filter(t => t.type === 'expense')
+      .filter(t => {
+        const d = new Date(t.date);
+        return d >= fourteenDaysAgo && d < sevenDaysAgo;
+      })
+      .reduce((sum, t) => sum + t.amount, 0);
+
+    return { thisWeek, lastWeek };
+  };
+
+  const { thisWeek: thisWeekExpenses, lastWeek: lastWeekExpenses } = getWeeklyComparisonInsight();
+
+  // Dynamically assemble Carousel slides if anomalies, budget advice, or trends exist
   const carouselSlides: { id: string; element: React.ReactNode }[] = [];
 
+  // Slide 1: Anomaly
   if (unusualSpendings.length > 0) {
     carouselSlides.push({
       id: 'anomaly',
@@ -132,7 +181,7 @@ export default function HomeTab({
                 <div className="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
                   <Sparkles size={13} className="animate-pulse" />
                 </div>
-                <h3 className="text-[10px] font-black tracking-wide uppercase text-indigo-355">Analisis Anomali Mingguan</h3>
+                <h3 className="text-[10px] font-black tracking-wide uppercase text-indigo-300">Analisis Anomali Mingguan</h3>
               </div>
               <span className="px-2 py-0.5 rounded-full bg-indigo-500/25 border border-indigo-400/20 text-[8px] font-black text-indigo-300 uppercase tracking-wider">
                 Unusual Spendings
@@ -154,12 +203,12 @@ export default function HomeTab({
                       </div>
                       <div className="min-w-0">
                         <h4 className="text-[11px] font-bold text-white truncate">{tx.title}</h4>
-                        <span className="text-[9px] text-slate-400 block mt-0.5">{formatShortDate(tx.date)}</span>
+                        <span className="text-[9px] text-slate-300 block mt-0.5">{formatShortDate(tx.date)}</span>
                       </div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <span className="text-[11px] font-black text-rose-300 block">-{formatRupiah(tx.amount)}</span>
-                      <span className="text-[8px] font-bold text-indigo-455 uppercase tracking-wide">
+                      <span className="text-[11px] font-black text-rose-355 block">-{formatRupiah(tx.amount)}</span>
+                      <span className="text-[8px] font-bold text-indigo-300 uppercase tracking-wide">
                         {tx.amount >= 500000 ? 'Skala Besar 🚨' : 'Lonjakan 2x ⚡'}
                       </span>
                     </div>
@@ -169,7 +218,7 @@ export default function HomeTab({
             </div>
           </div>
           
-          <p className="text-[9px] text-slate-400 italic leading-snug pt-1.5 border-t border-white/[0.05]">
+          <p className="text-[9px] text-slate-300 italic leading-snug pt-1.5 border-t border-white/[0.05]">
             💡 Tip: Rem pembelian impulsif besar di luar anggaran mingguan Anda.
           </p>
         </div>
@@ -177,6 +226,7 @@ export default function HomeTab({
     });
   }
 
+  // Slide 2: Budget Overrun
   if (budgetAdvice) {
     carouselSlides.push({
       id: 'budget-overrun',
@@ -191,9 +241,9 @@ export default function HomeTab({
                 <div className="w-6 h-6 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center">
                   <AlertCircle size={13} className="animate-bounce" />
                 </div>
-                <h3 className="text-[10px] font-black tracking-wide uppercase text-rose-355">{budgetAdvice.title}</h3>
+                <h3 className="text-[10px] font-black tracking-wide uppercase text-rose-200">{budgetAdvice.title}</h3>
               </div>
-              <span className="px-2 py-0.5 rounded-full bg-rose-500/25 border border-rose-400/20 text-[8px] font-black text-rose-350 uppercase tracking-wider">
+              <span className="px-2 py-0.5 rounded-full bg-rose-500/25 border border-rose-400/20 text-[8px] font-black text-rose-355 uppercase tracking-wider">
                 Budget Advice
               </span>
             </div>
@@ -203,8 +253,101 @@ export default function HomeTab({
             </p>
           </div>
           
-          <p className="text-[9.5px] text-rose-200 font-medium leading-snug pt-1.5 border-t border-white/[0.05] italic">
+          <p className="text-[9.5px] text-rose-200 font-semibold leading-snug pt-1.5 border-t border-white/[0.05] italic">
             {budgetAdvice.advice}
+          </p>
+        </div>
+      )
+    });
+  }
+
+  // Slide 3: Weekly Trend Comparison
+  if (transactions.filter(t => t.type === 'expense').length > 0) {
+    const percentDiff = lastWeekExpenses > 0 
+      ? Math.round(((thisWeekExpenses - lastWeekExpenses) / lastWeekExpenses) * 100)
+      : 0;
+
+    const isIncrease = thisWeekExpenses > lastWeekExpenses;
+    
+    carouselSlides.push({
+      id: 'weekly-compare',
+      element: (
+        <div className={`p-4 rounded-[22px] bg-gradient-to-br ${
+          isIncrease 
+            ? 'from-amber-900 via-amber-950 to-slate-900 border-amber-900/30' 
+            : 'from-emerald-900 via-emerald-950 to-slate-900 border-emerald-900/30'
+        } text-white shadow-md relative overflow-hidden h-[185px] flex flex-col justify-between transition-all duration-300`}>
+          <div className="absolute right-0 top-0 w-32 h-32 bg-white/5 rounded-full translate-x-12 -translate-y-12 blur-xl"></div>
+          
+          <div className="relative z-10 space-y-2">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className={`w-6 h-6 rounded-lg ${isIncrease ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'} flex items-center justify-center`}>
+                  <Lightbulb size={13} />
+                </div>
+                <h3 className="text-[10px] font-black tracking-wide uppercase text-slate-350">Tren Belanja Mingguan</h3>
+              </div>
+              <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider ${
+                isIncrease ? 'bg-amber-500/25 border border-amber-400/20 text-amber-300' : 'bg-emerald-500/25 border border-emerald-400/20 text-emerald-300'
+              }`}>
+                {isIncrease ? 'Naik 📈' : 'Hemat 📉'}
+              </span>
+            </div>
+            
+            <p className="text-[11px] text-slate-300 leading-snug">
+              Pengeluaran minggu ini sebesar <span className="font-extrabold text-white">{formatRupiah(thisWeekExpenses)}</span>.
+              {lastWeekExpenses > 0 ? (
+                <span>
+                  {' '}Dibandingkan minggu lalu ({formatRupiah(lastWeekExpenses)}), belanja Anda{' '}
+                  <span className={`font-black ${isIncrease ? 'text-rose-250' : 'text-emerald-250'}`}>
+                    {isIncrease ? `meningkat ${percentDiff}%` : `menghemat ${Math.abs(percentDiff)}%`}
+                  </span>.
+                </span>
+              ) : (
+                ' Mulai pertahankan pengeluaran agar tetap seimbang dengan pemasukan Anda.'
+              )}
+            </p>
+          </div>
+          
+          <p className="text-[9.5px] text-slate-300 font-semibold leading-snug pt-1.5 border-t border-white/[0.05] italic">
+            {isIncrease 
+              ? '💡 Tip: Telusuri riwayat belanja Anda minggu ini dan batasi transaksi non-primer agar saldo stabil.'
+              : '💡 Tip: Bagus sekali! Penghematan minggu ini bisa dialokasikan untuk menambah target tabungan Anda.'
+            }
+          </p>
+        </div>
+      )
+    });
+  }
+
+  // Slide 4: Welcome / Fallback Slide
+  if (carouselSlides.length === 0) {
+    carouselSlides.push({
+      id: 'welcome',
+      element: (
+        <div className="p-4 rounded-[22px] bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 border border-indigo-850/30 text-white shadow-md relative overflow-hidden h-[185px] flex flex-col justify-between transition-all duration-300">
+          <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/10 rounded-full translate-x-12 -translate-y-12 blur-xl"></div>
+          
+          <div className="relative z-10 space-y-2">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
+                  <Sparkles size={13} />
+                </div>
+                <h3 className="text-[10px] font-black tracking-wide uppercase text-indigo-300">Tips Finansial UangKu</h3>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-indigo-500/25 border border-indigo-400/20 text-[8px] font-black text-indigo-300 uppercase tracking-wider">
+                Tips
+              </span>
+            </div>
+            
+            <p className="text-[11.5px] text-slate-300 leading-snug">
+              Selamat datang di asisten finansial Anda! Mulai catat pemasukan bulanan dan pengeluaran harian secara rutin untuk mengaktifkan grafik mingguan dan analisis keuangan otomatis.
+            </p>
+          </div>
+          
+          <p className="text-[9.5px] text-indigo-200 font-semibold leading-snug pt-1.5 border-t border-white/[0.05] italic">
+            💡 Tip: Atur anggaran batas per kategori belanja di tab Anggaran agar pengeluaran Anda tetap terkontrol.
           </p>
         </div>
       )
@@ -232,7 +375,7 @@ export default function HomeTab({
       return {
         title: 'Dompet Defisit! ⚠️',
         message: `Pengeluaran Anda melebihi pemasukan sebesar ${formatRupiah(totalExpense - totalIncome)}. Coba batasi belanja non-primer dan amankan pos pengeluaran.`,
-        color: 'bg-rose-50 border-rose-100 text-rose-700',
+        color: 'bg-rose-50 border-rose-200 text-rose-700',
         icon: AlertCircle
       };
     }
@@ -242,7 +385,7 @@ export default function HomeTab({
       return {
         title: 'Anggaran Melampaui Batas! 🚨',
         message: `Anda telah melebihi batas anggaran untuk kategori: ${catNames.join(', ')}. Tunda pengeluaran ini hingga bulan berikutnya.`,
-        color: 'bg-pink-50/70 border-pink-100/70 text-pink-700',
+        color: 'bg-pink-50 border-pink-200 text-pink-700',
         icon: AlertCircle
       };
     }
@@ -252,7 +395,7 @@ export default function HomeTab({
       return {
         title: 'Mendekati Batas Anggaran 🔔',
         message: `Anggaran kategori ${catName} sudah terpakai lebih dari 80%. Rem belanja untuk kategori ini agar saldo bulanan tetap aman.`,
-        color: 'bg-amber-50/70 border-amber-100/70 text-amber-700',
+        color: 'bg-amber-50 border-amber-200 text-amber-700',
         icon: Info
       };
     }
@@ -261,7 +404,7 @@ export default function HomeTab({
       return {
         title: 'Kesehatan Dompet: Sangat Sehat! 🌟',
         message: `Hebat! Anda berhasil menabung ${Math.round(savingRate)}% dari pemasukan. Teruskan performa luar biasa ini untuk dana darurat Anda.`,
-        color: 'bg-emerald-50 border-emerald-100 text-emerald-700',
+        color: 'bg-emerald-50 border-emerald-200 text-emerald-700',
         icon: Lightbulb
       };
     }
@@ -270,7 +413,7 @@ export default function HomeTab({
       return {
         title: 'Kondisi Keuangan: Stabil 📈',
         message: `Anda menyisihkan ${Math.round(savingRate)}% dari pemasukan. Tingkatkan porsi tabungan dengan mengurangi jajan atau pengeluaran impulsif.`,
-        color: 'bg-blue-50 border-blue-100 text-blue-700',
+        color: 'bg-blue-50 border-blue-200 text-blue-700',
         icon: Lightbulb
       };
     }
@@ -278,7 +421,7 @@ export default function HomeTab({
     return {
       title: 'Catat Pemasukan Anda 💵',
       message: 'Belum ada pemasukan yang dicatat. Masukkan pemasukan bulanan agar analisis rasio tabungan dapat berfungsi.',
-      color: 'bg-slate-50 border-slate-100 text-slate-600',
+      color: 'bg-slate-50 border-slate-200 text-slate-650',
       icon: Info
     };
   };
@@ -339,13 +482,13 @@ export default function HomeTab({
   return (
     <div className="space-y-5 animate-slide-up">
       {/* Balance Card */}
-      <div className="p-5 rounded-[24px] bg-gradient-to-br from-indigo-500 via-indigo-500 to-purple-600 text-white shadow-xl shadow-indigo-200/50 relative overflow-hidden">
+      <div className="p-5 rounded-[24px] bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 text-white shadow-xl shadow-indigo-100/50 relative overflow-hidden">
         <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full translate-x-8 -translate-y-8 blur-xl"></div>
         <div className="absolute left-0 bottom-0 w-24 h-24 bg-purple-500/20 rounded-full -translate-x-6 translate-y-6 blur-lg"></div>
 
         <div className="relative z-10">
-          <span className="text-xs font-semibold tracking-wide uppercase opacity-85">Total Saldo Anda</span>
-          <h2 className="text-2xl font-bold mt-1 tracking-tight">
+          <span className="text-xs font-bold tracking-wider uppercase opacity-90">Total Saldo Anda</span>
+          <h2 className="text-3xl font-extrabold mt-1 tracking-tight">
             {loadingTxs ? (
               <span className="inline-block w-40 h-8 bg-white/20 animate-pulse rounded"></span>
             ) : (
@@ -353,14 +496,14 @@ export default function HomeTab({
             )}
           </h2>
 
-          <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-white/10">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center">
-                <ArrowUpRight size={16} className="text-emerald-300" />
+          <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-white/15">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8.5 h-8.5 rounded-full bg-white/15 flex items-center justify-center">
+                <ArrowUpRight size={17} className="text-emerald-300" />
               </div>
               <div>
-                <span className="text-xs text-white/80 block uppercase tracking-wide">Pemasukan</span>
-                <span className="text-xs font-bold block">
+                <span className="text-[10px] text-white/80 block uppercase tracking-wider font-bold">Pemasukan</span>
+                <span className="text-[13px] font-black block">
                   {loadingTxs ? (
                     <span className="inline-block w-16 h-4 bg-white/20 animate-pulse rounded"></span>
                   ) : (
@@ -370,13 +513,13 @@ export default function HomeTab({
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center">
-                <ArrowDownRight size={16} className="text-rose-300" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8.5 h-8.5 rounded-full bg-white/15 flex items-center justify-center">
+                <ArrowDownRight size={17} className="text-rose-300" />
               </div>
               <div>
-                <span className="text-xs text-white/80 block uppercase tracking-wide">Pengeluaran</span>
-                <span className="text-xs font-bold block text-rose-100">
+                <span className="text-[10px] text-white/80 block uppercase tracking-wider font-bold">Pengeluaran</span>
+                <span className="text-[13px] font-black block text-rose-100">
                   {loadingTxs ? (
                     <span className="inline-block w-16 h-4 bg-white/20 animate-pulse rounded"></span>
                   ) : (
@@ -388,6 +531,29 @@ export default function HomeTab({
           </div>
         </div>
       </div>
+
+      {/* Accounts Balances Bar */}
+      {accountBalances.filter(acc => acc.balance !== 0).length > 0 && (
+        <div className="space-y-2">
+          <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block px-1">Dompet & Rekening</span>
+          <div className="flex gap-2.5 overflow-x-auto pb-1 px-0.5 -mx-4 px-4 no-scrollbar">
+            {accountBalances.filter(acc => acc.balance !== 0).map(acc => (
+              <div 
+                key={acc.id}
+                className="p-3.5 bg-white border border-slate-200 rounded-2xl min-w-[125px] flex flex-col justify-between shadow-3xs"
+              >
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <div className="w-6.5 h-6.5 rounded-lg bg-indigo-50 text-indigo-650 flex items-center justify-center flex-shrink-0 shadow-3xs">
+                    <DynamicIcon name={acc.icon} size={13} />
+                  </div>
+                  <span className="text-[10.5px] font-black text-slate-700 truncate leading-none">{acc.name}</span>
+                </div>
+                <span className="text-xs font-black text-slate-850 block mt-2.5">{formatRupiah(acc.balance)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Dynamic Financial Insights Panel */}
       <div className={`p-4 rounded-[22px] border ${insight.color} flex gap-3 transition-colors shadow-2xs`}>
@@ -401,25 +567,25 @@ export default function HomeTab({
       </div>
 
       {/* Chart Card */}
-      <div className="p-4 rounded-[22px] bg-white border border-slate-100 shadow-xs">
+      <div className="p-4 rounded-[22px] bg-white border border-slate-200 shadow-xs">
         <div className="flex justify-between items-center mb-3">
           <div>
-            <h3 className="text-sm font-bold text-slate-800">Tren Pengeluaran</h3>
-            <p className="text-xs text-slate-400">Analisis pengeluaran 7 hari terakhir</p>
+            <h3 className="text-sm font-extrabold text-slate-800">Tren Pengeluaran</h3>
+            <p className="text-xs text-slate-500 font-medium">Analisis pengeluaran 7 hari terakhir</p>
           </div>
-          <div className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-500 text-xs font-bold">
+          <div className="px-2.5 py-1 rounded-full bg-rose-50 border border-rose-100 text-rose-600 text-xs font-extrabold">
             Grafik Mingguan
           </div>
         </div>
 
         {loadingTxs ? (
           <div className="h-[120px] flex items-center justify-center bg-slate-50/50 rounded-lg">
-            <span className="text-xs text-slate-400 animate-pulse">Menghitung tren keuangan...</span>
+            <span className="text-xs text-slate-500 animate-pulse">Menghitung tren keuangan...</span>
           </div>
         ) : transactions.filter(t => t.type === 'expense').length === 0 ? (
           <div className="h-[120px] flex flex-col items-center justify-center bg-slate-50/50 rounded-lg p-4 text-center">
             <Info size={18} className="text-slate-400 mb-1" />
-            <span className="text-[11px] text-slate-500">Belum ada pengeluaran dicatat minggu ini.</span>
+            <span className="text-[11px] text-slate-550 font-bold">Belum ada pengeluaran dicatat minggu ini.</span>
           </div>
         ) : (
           <div className="relative pt-2">
@@ -431,9 +597,9 @@ export default function HomeTab({
                 </linearGradient>
               </defs>
 
-              <line x1="10" y1={svgHeight - 15} x2={svgWidth - 10} y2={svgHeight - 15} stroke="#f1f5f9" strokeWidth="1" />
-              <line x1="10" y1={svgHeight / 2 + 5} x2={svgWidth - 10} y2={svgHeight / 2 + 5} stroke="#f1f5f9" strokeWidth="1" strokeDasharray="3,3" />
-              <line x1="10" y1="15" x2={svgWidth - 10} y2="15" stroke="#f1f5f9" strokeWidth="1" />
+              <line x1="10" y1={svgHeight - 15} x2={svgWidth - 10} y2={svgHeight - 15} stroke="#e2e8f0" strokeWidth="1" />
+              <line x1="10" y1={svgHeight / 2 + 5} x2={svgWidth - 10} y2={svgHeight / 2 + 5} stroke="#e2e8f0" strokeWidth="1" strokeDasharray="3,3" />
+              <line x1="10" y1="15" x2={svgWidth - 10} y2="15" stroke="#e2e8f0" strokeWidth="1" />
 
               {areaPathStr && <path d={areaPathStr} fill="url(#chartGradient)" />}
               {pathStr && (
@@ -441,7 +607,7 @@ export default function HomeTab({
                   d={pathStr} 
                   fill="none" 
                   stroke="#6366f1" 
-                  strokeWidth="2.5" 
+                  strokeWidth="3.5" 
                   strokeLinecap="round" 
                   strokeLinejoin="round" 
                 />
@@ -452,10 +618,10 @@ export default function HomeTab({
                   <circle 
                     cx={pt.x} 
                     cy={pt.y} 
-                    r="4.5" 
+                    r="5" 
                     fill="#ffffff" 
                     stroke="#6366f1" 
-                    strokeWidth="2.5" 
+                    strokeWidth="3" 
                   />
                   <circle 
                     cx={pt.x} 
@@ -471,8 +637,8 @@ export default function HomeTab({
             <div className="flex justify-between px-2 mt-1">
               {chartData.map((d, idx) => (
                 <div key={idx} className="text-center w-[40px]">
-                  <span className="text-[10px] sm:text-[11px] font-semibold text-slate-400 block">{d.day}</span>
-                  <span className="text-[10px] font-bold text-slate-600 block truncate">
+                  <span className="text-[10px] sm:text-[11px] font-extrabold text-slate-500 block">{d.day}</span>
+                  <span className="text-[10px] font-black text-slate-700 block truncate">
                     {d.amount > 0 ? (d.amount >= 1000 ? `${Math.round(d.amount/1000)}k` : d.amount) : '-'}
                   </span>
                 </div>
@@ -541,26 +707,26 @@ export default function HomeTab({
               const isNearLimit = percent >= 80;
               
               return (
-                <div key={b.categoryId} className="p-3 bg-white border border-slate-100 rounded-2xl flex items-center justify-between shadow-2xs">
+                <div key={b.categoryId} className="p-3.5 bg-white border border-slate-200 rounded-2xl flex items-center justify-between shadow-sm">
                   <div className="flex items-center gap-3 w-1/2">
-                    <div className={`w-8 h-8 rounded-xl ${cat?.color || 'bg-slate-50 text-slate-500'} flex items-center justify-center flex-shrink-0`}>
+                    <div className={`w-8.5 h-8.5 rounded-xl ${cat?.color || 'bg-slate-50 text-slate-500'} flex items-center justify-center flex-shrink-0`}>
                       {cat && <DynamicIcon name={cat.icon} size={15} />}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-slate-700 truncate">{cat?.name}</h4>
-                      <span className="text-[11px] text-slate-400">
+                      <h4 className="text-xs font-extrabold text-slate-800 truncate">{cat?.name}</h4>
+                      <span className="text-xs text-slate-500 font-medium">
                         {formatRupiah(b.spent)} dari {formatRupiah(b.limit)}
                       </span>
                     </div>
                   </div>
 
-                  <div className="w-1/3 flex flex-col items-end gap-1">
-                    <span className={`text-xs font-bold ${isNearLimit ? 'text-rose-500' : 'text-slate-500'}`}>
+                  <div className="w-1/3 flex flex-col items-end gap-1.5">
+                    <span className={`text-xs font-extrabold ${isNearLimit ? 'text-rose-600' : 'text-indigo-650'}`}>
                       {percent}%
                     </span>
-                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                       <div 
-                        className={`h-full rounded-full transition-all duration-500 ${isNearLimit ? 'bg-rose-400' : 'bg-indigo-400'}`}
+                        className={`h-full rounded-full transition-all duration-500 ${isNearLimit ? 'bg-rose-500' : 'bg-indigo-500'}`}
                         style={{ width: `${percent}%` }}
                       ></div>
                     </div>
@@ -601,29 +767,38 @@ export default function HomeTab({
           <div className="space-y-2">
             {transactions.slice(0, 3).map(tx => {
               const cat = CATEGORIES.find(c => c.id === tx.categoryId);
+              const acc = accounts.find(a => a.id === tx.accountId) || accounts.find(a => a.id === 'acc-tunai');
               return (
                 <div 
                   key={tx.id} 
                   onClick={() => setSelectedTxDetail(tx)}
-                  className="p-3 bg-white border border-slate-100 rounded-2xl flex items-center justify-between shadow-2xs hover:bg-slate-50/70 transition-all cursor-pointer hover:translate-x-0.5"
+                  className="p-3 bg-white border border-slate-200 rounded-2xl flex items-center justify-between shadow-sm hover:bg-slate-50/70 transition-all cursor-pointer hover:translate-x-0.5"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-xl ${cat?.color || 'bg-slate-50 text-slate-500'} flex items-center justify-center flex-shrink-0`}>
+                    <div className={`w-8.5 h-8.5 rounded-xl ${cat?.color || 'bg-slate-50 text-slate-500'} flex items-center justify-center flex-shrink-0`}>
                       {cat && <DynamicIcon name={cat.icon} size={15} />}
                     </div>
                     <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-slate-700 truncate">{tx.title}</h4>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
-                        {formatShortDate(tx.date)} {tx.notes && `• ${tx.notes}`}
-                      </p>
+                      <h4 className="text-xs font-extrabold text-slate-800 truncate">{tx.title}</h4>
+                      <div className="flex items-center flex-wrap gap-1.5 mt-0.5">
+                        <span className="text-[11px] text-slate-550 font-medium">
+                          {formatShortDate(tx.date)} {tx.notes && `• ${tx.notes}`}
+                        </span>
+                        {acc && (
+                          <span className="px-1.5 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[9px] font-extrabold text-slate-600 flex items-center gap-0.5">
+                            <DynamicIcon name={acc.icon} size={8} />
+                            {acc.name}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   <div className="text-right flex-shrink-0 pl-2">
-                    <span className={`text-xs font-bold block ${tx.type === 'income' ? 'text-emerald-500' : 'text-slate-700'}`}>
+                    <span className={`text-xs font-extrabold block ${tx.type === 'income' ? 'text-emerald-600' : 'text-slate-800'}`}>
                       {tx.type === 'income' ? '+' : '-'}{formatRupiah(tx.amount)}
                     </span>
-                    <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                    <span className="text-[10px] font-black text-slate-500 block uppercase">
                       {cat?.name}
                     </span>
                   </div>

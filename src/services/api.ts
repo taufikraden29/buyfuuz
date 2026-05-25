@@ -1,21 +1,38 @@
-import type { Transaction, Category, Budget, SavingsGoal, Bill } from '../types/finance';
+import type { Transaction, Category, Budget, SavingsGoal, Bill, Account } from '../types/finance';
 
-export const CATEGORIES: Category[] = [
-  { id: 'cat-makanan', name: 'Makanan & Minuman', icon: 'Utensils', color: 'bg-orange-50 text-orange-500 border border-orange-100/55', hexColor: '#f97316', type: 'expense' },
-  { id: 'cat-belanja', name: 'Belanja', icon: 'ShoppingBag', color: 'bg-purple-50 text-purple-500 border border-purple-100/55', hexColor: '#a855f7', type: 'expense' },
-  { id: 'cat-transport', name: 'Transportasi', icon: 'Car', color: 'bg-blue-50 text-blue-500 border border-blue-100/55', hexColor: '#3b82f6', type: 'expense' },
-  { id: 'cat-hiburan', name: 'Hiburan', icon: 'Sparkles', color: 'bg-pink-50 text-pink-500 border border-pink-100/55', hexColor: '#ec4899', type: 'expense' },
-  { id: 'cat-tagihan', name: 'Tagihan', icon: 'Receipt', color: 'bg-amber-50 text-amber-500 border border-amber-100/55', hexColor: '#f59e0b', type: 'expense' },
-  { id: 'cat-kesehatan', name: 'Kesehatan', icon: 'HeartPulse', color: 'bg-rose-50 text-rose-500 border border-rose-100/55', hexColor: '#f43f5e', type: 'expense' },
-  { id: 'cat-gaji', name: 'Gaji Bulanan', icon: 'Coins', color: 'bg-emerald-50 text-emerald-600 border border-emerald-100/55', hexColor: '#10b981', type: 'income' },
-  { id: 'cat-investasi', name: 'Investasi', icon: 'TrendingUp', color: 'bg-indigo-50 text-indigo-500 border border-indigo-100/55', hexColor: '#6366f1', type: 'both' },
-  { id: 'cat-lainnya', name: 'Lain-lain', icon: 'HelpCircle', color: 'bg-slate-50 text-slate-500 border border-slate-100/55', hexColor: '#64748b', type: 'both' },
+const INITIAL_CATEGORIES: Category[] = [
+  { id: 'cat-makanan', name: 'Makanan & Minuman', icon: 'Utensils', color: 'bg-orange-50 text-orange-500 border border-orange-200', hexColor: '#f97316', type: 'expense' },
+  { id: 'cat-belanja', name: 'Belanja', icon: 'ShoppingBag', color: 'bg-purple-50 text-purple-500 border border-purple-200', hexColor: '#a855f7', type: 'expense' },
+  { id: 'cat-transport', name: 'Transportasi', icon: 'Car', color: 'bg-blue-50 text-blue-500 border border-blue-200', hexColor: '#3b82f6', type: 'expense' },
+  { id: 'cat-hiburan', name: 'Hiburan', icon: 'Sparkles', color: 'bg-pink-50 text-pink-500 border border-pink-200', hexColor: '#ec4899', type: 'expense' },
+  { id: 'cat-tagihan', name: 'Tagihan', icon: 'Receipt', color: 'bg-amber-50 text-amber-500 border border-amber-200', hexColor: '#f59e0b', type: 'expense' },
+  { id: 'cat-kesehatan', name: 'Kesehatan', icon: 'HeartPulse', color: 'bg-rose-50 text-rose-500 border border-rose-200', hexColor: '#f43f5e', type: 'expense' },
+  { id: 'cat-gaji', name: 'Gaji Bulanan', icon: 'Coins', color: 'bg-emerald-50 text-emerald-600 border border-emerald-200', hexColor: '#10b981', type: 'income' },
+  { id: 'cat-investasi', name: 'Investasi', icon: 'TrendingUp', color: 'bg-indigo-50 text-indigo-500 border border-indigo-200', hexColor: '#6366f1', type: 'both' },
+  { id: 'cat-lainnya', name: 'Lain-lain', icon: 'HelpCircle', color: 'bg-slate-50 text-slate-500 border border-slate-200', hexColor: '#64748b', type: 'both' },
+];
+
+const INITIAL_ACCOUNTS: Account[] = [
+  { id: 'acc-tunai', name: 'Tunai (Cash)', type: 'cash', icon: 'Wallet' },
+  { id: 'acc-bank', name: 'Rekening Bank', type: 'bank', icon: 'CreditCard' },
+  { id: 'acc-gopay', name: 'GoPay', type: 'wallet', icon: 'Smartphone' },
 ];
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+const getStorageItem = <T>(key: string, defaultValue: T): T => {
+  const data = localStorage.getItem(key);
+  return data ? JSON.parse(data) : defaultValue;
+};
+
+const setStorageItem = <T>(key: string, value: T): void => {
+  localStorage.setItem(key, JSON.stringify(value));
+};
+
+// Export CATEGORIES as a dynamic array initialized from Local Storage or defaults
+export let CATEGORIES: Category[] = getStorageItem<Category[]>('finance_categories', INITIAL_CATEGORIES);
+
 const getNextMonthDate = (dateStr: string): string => {
-  // Extract clean YYYY-MM-DD part to ignore any times or timezone suffixes
   const cleanDateStr = (dateStr || '').slice(0, 10);
   const [yearStr, monthStr, dayStr] = cleanDateStr.split('-');
   let year = Number(yearStr);
@@ -28,14 +45,12 @@ const getNextMonthDate = (dateStr: string): string => {
     return fallback.toISOString().split('T')[0];
   }
   
-  // Advance month
   month += 1;
   if (month > 12) {
     month = 1;
     year += 1;
   }
   
-  // Handle end of month issues (e.g. 31 Jan -> 28 Feb)
   const lastDayOfNextMonth = new Date(year, month, 0).getDate();
   if (day > lastDayOfNextMonth) {
     day = lastDayOfNextMonth;
@@ -48,21 +63,14 @@ const getNextMonthDate = (dateStr: string): string => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-const getStorageItem = <T>(key: string, defaultValue: T): T => {
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : defaultValue;
-};
-
-const setStorageItem = <T>(key: string, value: T): void => {
-  localStorage.setItem(key, JSON.stringify(value));
-};
-
 // Seed initial data if empty
 const seedData = () => {
   const transactionsKey = 'finance_transactions';
   const budgetsKey = 'finance_budgets';
   const savingsGoalsKey = 'finance_savings_goals';
   const billsKey = 'finance_bills';
+  const categoriesKey = 'finance_categories';
+  const accountsKey = 'finance_accounts';
 
   const today = new Date();
   const getPastDateStr = (daysAgo: number) => {
@@ -71,18 +79,26 @@ const seedData = () => {
     return d.toISOString().split('T')[0];
   };
 
+  if (!localStorage.getItem(categoriesKey)) {
+    setStorageItem(categoriesKey, INITIAL_CATEGORIES);
+  }
+
+  if (!localStorage.getItem(accountsKey)) {
+    setStorageItem(accountsKey, INITIAL_ACCOUNTS);
+  }
+
   if (!localStorage.getItem(transactionsKey)) {
     const initialTransactions: Transaction[] = [
-      { id: 't1', title: 'Gaji Bulanan', amount: 9500000, type: 'income', categoryId: 'cat-gaji', date: getPastDateStr(5), notes: 'Gaji pokok bulan Mei' },
-      { id: 't2', title: 'Makan Siang Ramen', amount: 65000, type: 'expense', categoryId: 'cat-makanan', date: getPastDateStr(0), notes: 'Makan ramen bersama teman' },
-      { id: 't3', title: 'Kopi Susu Senja', amount: 28000, type: 'expense', categoryId: 'cat-makanan', date: getPastDateStr(0) },
-      { id: 't4', title: 'Bensin Motor', amount: 50000, type: 'expense', categoryId: 'cat-transport', date: getPastDateStr(1), notes: 'Pertalite full tank' },
-      { id: 't5', title: 'Beli Kemeja Baru', amount: 249000, type: 'expense', categoryId: 'cat-belanja', date: getPastDateStr(2), notes: 'Kemeja untuk meeting' },
-      { id: 't6', title: 'Nonton Bioskop', amount: 80000, type: 'expense', categoryId: 'cat-hiburan', date: getPastDateStr(3), notes: 'Tiket bioskop + popcorn' },
-      { id: 't7', title: 'Bayar Listrik & Wifi', amount: 485000, type: 'expense', categoryId: 'cat-tagihan', date: getPastDateStr(4), notes: 'Tagihan bulanan' },
-      { id: 't8', title: 'Beli Vitamin C', amount: 75000, type: 'expense', categoryId: 'cat-kesehatan', date: getPastDateStr(4) },
-      { id: 't9', title: 'Dividen Reksa Dana', amount: 350000, type: 'income', categoryId: 'cat-investasi', date: getPastDateStr(3), notes: 'Dividen bulanan' },
-      { id: 't10', title: 'Gopay Topup Transport', amount: 30000, type: 'expense', categoryId: 'cat-transport', date: getPastDateStr(0) },
+      { id: 't1', title: 'Gaji Bulanan', amount: 9500000, type: 'income', categoryId: 'cat-gaji', accountId: 'acc-bank', date: getPastDateStr(5), notes: 'Gaji pokok bulan Mei' },
+      { id: 't2', title: 'Makan Siang Ramen', amount: 65000, type: 'expense', categoryId: 'cat-makanan', accountId: 'acc-tunai', date: getPastDateStr(0), notes: 'Makan ramen bersama teman' },
+      { id: 't3', title: 'Kopi Susu Senja', amount: 28000, type: 'expense', categoryId: 'cat-makanan', accountId: 'acc-gopay', date: getPastDateStr(0) },
+      { id: 't4', title: 'Bensin Motor', amount: 50000, type: 'expense', categoryId: 'cat-transport', accountId: 'acc-tunai', date: getPastDateStr(1), notes: 'Pertalite full tank' },
+      { id: 't5', title: 'Beli Kemeja Baru', amount: 249000, type: 'expense', categoryId: 'cat-belanja', accountId: 'acc-bank', date: getPastDateStr(2), notes: 'Kemeja untuk meeting' },
+      { id: 't6', title: 'Nonton Bioskop', amount: 80000, type: 'expense', categoryId: 'cat-hiburan', accountId: 'acc-gopay', date: getPastDateStr(3), notes: 'Tiket bioskop + popcorn' },
+      { id: 't7', title: 'Bayar Listrik & Wifi', amount: 485000, type: 'expense', categoryId: 'cat-tagihan', accountId: 'acc-bank', date: getPastDateStr(4), notes: 'Tagihan bulanan' },
+      { id: 't8', title: 'Beli Vitamin C', amount: 75000, type: 'expense', categoryId: 'cat-kesehatan', accountId: 'acc-tunai', date: getPastDateStr(4) },
+      { id: 't9', title: 'Dividen Reksa Dana', amount: 350000, type: 'income', categoryId: 'cat-investasi', accountId: 'acc-bank', date: getPastDateStr(3), notes: 'Dividen bulanan' },
+      { id: 't10', title: 'Gopay Topup Transport', amount: 30000, type: 'expense', categoryId: 'cat-transport', accountId: 'acc-gopay', date: getPastDateStr(0) },
     ];
     setStorageItem(transactionsKey, initialTransactions);
   }
@@ -119,13 +135,13 @@ const seedData = () => {
   }
 };
 
-// Execute seeding
 seedData();
+// Make sure CATEGORIES is loaded after potential seeding
+CATEGORIES = getStorageItem<Category[]>('finance_categories', INITIAL_CATEGORIES);
 
-// API implementations
 export const api = {
   getTransactions: async (): Promise<Transaction[]> => {
-    await sleep(400); // simulate delay
+    await sleep(400);
     return getStorageItem<Transaction[]>('finance_transactions', []);
   },
 
@@ -134,9 +150,10 @@ export const api = {
     const transactions = getStorageItem<Transaction[]>('finance_transactions', []);
     const newTransaction: Transaction = {
       ...transaction,
+      accountId: transaction.accountId || 'acc-tunai',
       id: `t-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     };
-    transactions.unshift(newTransaction); // Add to beginning
+    transactions.unshift(newTransaction);
     setStorageItem('finance_transactions', transactions);
     return newTransaction;
   },
@@ -144,6 +161,19 @@ export const api = {
   deleteTransaction: async (id: string): Promise<boolean> => {
     await sleep(400);
     const transactions = getStorageItem<Transaction[]>('finance_transactions', []);
+    const txToDelete = transactions.find(t => t.id === id);
+
+    if (txToDelete && txToDelete.billId) {
+      const bills = getStorageItem<Bill[]>('finance_bills', []);
+      const billExists = bills.some(b => b.id === txToDelete.billId);
+      if (billExists) {
+        // Revert the bill status. This will also handle recurring/installment reverts
+        // and delete the transaction from storage automatically.
+        await api.updateBillStatus(txToDelete.billId, 'unpaid');
+        return true;
+      }
+    }
+
     const filtered = transactions.filter(t => t.id !== id);
     setStorageItem('finance_transactions', filtered);
     return true;
@@ -154,7 +184,6 @@ export const api = {
     const budgets = getStorageItem<Budget[]>('finance_budgets', []);
     const transactions = getStorageItem<Transaction[]>('finance_transactions', []);
 
-    // Calculate actual spent per category for current month
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
@@ -219,7 +248,6 @@ export const api = {
     const index = goals.findIndex(g => g.id === id);
     if (index === -1) throw new Error('Goal not found');
 
-    // Make sure we don't go below 0 or exceed Target if we don't want to
     goals[index].currentAmount = Math.max(0, goals[index].currentAmount + amount);
     setStorageItem('finance_savings_goals', goals);
     return goals[index];
@@ -277,7 +305,7 @@ export const api = {
     }
   },
 
-  updateBillStatus: async (id: string, status: 'unpaid' | 'paid', payMonthsCount: number = 1): Promise<Bill> => {
+  updateBillStatus: async (id: string, status: 'unpaid' | 'paid', payMonthsCount: number = 1, accountId?: string): Promise<Bill> => {
     await sleep(400);
     const bills = getStorageItem<Bill[]>('finance_bills', []);
     const idx = bills.findIndex(b => b.id === id);
@@ -286,7 +314,6 @@ export const api = {
     const oldStatus = bills[idx].status;
     bills[idx].status = status;
     
-    // Automation 1: once marked PAID from UNPAID status
     if (status === 'paid' && oldStatus === 'unpaid') {
       if (bills[idx].isRecurring) {
         const nextDueDate = getNextMonthDate(bills[idx].dueDate);
@@ -306,9 +333,8 @@ export const api = {
         const currentNum = bills[idx].installmentNumber!;
         const totalCount = bills[idx].installmentCount!;
         
-        // Update current paid card's amount and title to reflect how many months were paid
         const baseTitle = bills[idx].title.replace(/\s*\(Cicilan\s+\d+(?:-\d+)?\/\d+\)$/i, '');
-        const singleAmount = bills[idx].amount; // the single month installment amount
+        const singleAmount = bills[idx].amount;
         
         if (payMonthsCount > 1) {
           bills[idx].amount = singleAmount * payMonthsCount;
@@ -318,7 +344,6 @@ export const api = {
         
         const nextNumber = currentNum + payMonthsCount;
         if (nextNumber <= totalCount) {
-          // Calculate due date for next unpaid installment (advanced by payMonthsCount months)
           let nextDueDate = bills[idx].dueDate;
           for (let m = 0; m < payMonthsCount; m++) {
             nextDueDate = getNextMonthDate(nextDueDate);
@@ -343,7 +368,6 @@ export const api = {
         }
       }
 
-      // Automatically create a corresponding Transaction
       const transactions = getStorageItem<Transaction[]>('finance_transactions', []);
       const newTransaction: Transaction = {
         id: `t-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -351,20 +375,17 @@ export const api = {
         amount: bills[idx].amount,
         type: bills[idx].type === 'debt' ? 'expense' : 'income',
         categoryId: bills[idx].type === 'debt' ? 'cat-tagihan' : 'cat-lainnya',
+        accountId: accountId || 'acc-bank', // default bills payments use Bank Account
         date: new Date().toISOString().split('T')[0],
-        notes: `Pelunasan otomatis dari menu Tagihan & Piutang`
+        notes: `Pelunasan otomatis dari menu Tagihan & Piutang`,
+        billId: bills[idx].id
       };
       transactions.unshift(newTransaction);
       setStorageItem('finance_transactions', transactions);
     }
     
-    // Automation 2: Rollback when status is set back to UNPAID from PAID (tidak jadi dilunasi)
     else if (status === 'unpaid' && oldStatus === 'paid') {
-      const originalTitle = bills[idx].title;
-
-      // 1. Rollback recurring bill
       if (bills[idx].isRecurring) {
-        // Find and delete the next generated recurring bill
         const nextDueDate = getNextMonthDate(bills[idx].dueDate);
         const nextBillIdx = bills.findIndex(b => 
           b.title === bills[idx].title && 
@@ -377,12 +398,10 @@ export const api = {
           bills.splice(nextBillIdx, 1);
         }
       } 
-      // 2. Rollback installment bill
       else if (bills[idx].isInstallment && bills[idx].installmentNumber && bills[idx].installmentCount) {
         const currentNum = bills[idx].installmentNumber!;
         const totalCount = bills[idx].installmentCount!;
         
-        // Parse current title to see how many months were paid
         const titleMatch = bills[idx].title.match(/\(Cicilan\s+(\d+)-(\d+)\/(\d+)\)$/i);
         let paidMonthsCount = 1;
         let singleAmount = bills[idx].amount;
@@ -396,11 +415,9 @@ export const api = {
         
         const baseTitle = bills[idx].title.replace(/\s*\(Cicilan\s+\d+(?:-\d+)?\/\d+\)$/i, '');
         
-        // Revert current bill's amount & title
         bills[idx].amount = singleAmount;
         bills[idx].title = `${baseTitle} (Cicilan ${currentNum}/${totalCount})`;
         
-        // Find and delete the next generated unpaid installment bill
         const nextNumber = currentNum + paidMonthsCount;
         const nextBillIdx = bills.findIndex(b => 
           b.parentBillId === bills[idx].parentBillId && 
@@ -412,12 +429,8 @@ export const api = {
         }
       }
 
-      // 3. Rollback the corresponding Transaction
       const transactions = getStorageItem<Transaction[]>('finance_transactions', []);
-      const txIdx = transactions.findIndex(t => 
-        (t.title === originalTitle || t.title.startsWith(originalTitle.replace(/\s*\(Cicilan\s+.*$/i, ''))) &&
-        t.notes === `Pelunasan otomatis dari menu Tagihan & Piutang`
-      );
+      const txIdx = transactions.findIndex(t => t.billId === id);
       if (txIdx !== -1) {
         transactions.splice(txIdx, 1);
         setStorageItem('finance_transactions', transactions);
@@ -433,6 +446,71 @@ export const api = {
     const bills = getStorageItem<Bill[]>('finance_bills', []);
     const filtered = bills.filter(b => b.id !== id);
     setStorageItem('finance_bills', filtered);
+
+    // Also delete any associated automatic settlement transactions
+    const transactions = getStorageItem<Transaction[]>('finance_transactions', []);
+    const filteredTxs = transactions.filter(t => t.billId !== id);
+    setStorageItem('finance_transactions', filteredTxs);
+
+    return true;
+  },
+
+  // Account Management API
+  getAccounts: async (): Promise<Account[]> => {
+    await sleep(300);
+    return getStorageItem<Account[]>('finance_accounts', INITIAL_ACCOUNTS);
+  },
+
+  addAccount: async (account: Omit<Account, 'id'>): Promise<Account> => {
+    await sleep(300);
+    const accounts = getStorageItem<Account[]>('finance_accounts', INITIAL_ACCOUNTS);
+    const newAccount: Account = {
+      ...account,
+      id: `acc-${Date.now()}`
+    };
+    accounts.push(newAccount);
+    setStorageItem('finance_accounts', accounts);
+    return newAccount;
+  },
+
+  deleteAccount: async (id: string): Promise<boolean> => {
+    await sleep(300);
+    const accounts = getStorageItem<Account[]>('finance_accounts', INITIAL_ACCOUNTS);
+    const filtered = accounts.filter(a => a.id !== id);
+    setStorageItem('finance_accounts', filtered);
+    return true;
+  },
+
+  // Custom Categories API
+  getCategories: async (): Promise<Category[]> => {
+    await sleep(300);
+    return getStorageItem<Category[]>('finance_categories', INITIAL_CATEGORIES);
+  },
+
+  addCategory: async (category: Omit<Category, 'id'>): Promise<Category> => {
+    await sleep(300);
+    const categories = getStorageItem<Category[]>('finance_categories', INITIAL_CATEGORIES);
+    const newCategory: Category = {
+      ...category,
+      id: `cat-${Date.now()}`
+    };
+    categories.push(newCategory);
+    setStorageItem('finance_categories', categories);
+    // Sync the synchronous in-memory export
+    CATEGORIES.push(newCategory);
+    return newCategory;
+  },
+
+  deleteCategory: async (id: string): Promise<boolean> => {
+    await sleep(300);
+    const categories = getStorageItem<Category[]>('finance_categories', INITIAL_CATEGORIES);
+    const filtered = categories.filter(c => c.id !== id);
+    setStorageItem('finance_categories', filtered);
+    // Sync the synchronous in-memory export
+    const idx = CATEGORIES.findIndex(c => c.id === id);
+    if (idx !== -1) {
+      CATEGORIES.splice(idx, 1);
+    }
     return true;
   }
 };

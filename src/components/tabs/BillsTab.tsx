@@ -102,22 +102,22 @@ export default function BillsTab({
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="p-3.5 bg-amber-50/70 border border-amber-100 rounded-2xl space-y-1">
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl shadow-sm space-y-1.5">
           <div className="flex justify-between items-center text-slate-455">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-600">Hutang Saya</span>
-            <ArrowUpRight size={13} className="text-amber-500" />
+            <span className="text-[11px] font-black uppercase tracking-wider text-amber-700">Hutang Saya</span>
+            <ArrowUpRight size={13} className="text-amber-600" />
           </div>
-          <p className="text-sm font-black text-amber-700">{formatRupiah(totalUnpaidDebt)}</p>
-          <p className="text-[10px] font-bold text-amber-500/80">Harus segera dibayar</p>
+          <p className="text-base font-black text-amber-800">{formatRupiah(totalUnpaidDebt)}</p>
+          <p className="text-[10px] font-bold text-amber-600">Harus segera dibayar</p>
         </div>
 
-        <div className="p-3.5 bg-emerald-50/70 border border-emerald-100 rounded-2xl space-y-1">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl shadow-sm space-y-1.5">
           <div className="flex justify-between items-center text-slate-455">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">Piutang Saya</span>
-            <ArrowDownRight size={13} className="text-emerald-500" />
+            <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700">Piutang Saya</span>
+            <ArrowDownRight size={13} className="text-emerald-600" />
           </div>
-          <p className="text-sm font-black text-emerald-700">{formatRupiah(totalUnpaidReceivable)}</p>
-          <p className="text-[10px] font-bold text-emerald-500/80">Harus segera ditagih</p>
+          <p className="text-base font-black text-emerald-800">{formatRupiah(totalUnpaidReceivable)}</p>
+          <p className="text-[10px] font-bold text-emerald-600">Harus segera ditagih</p>
         </div>
       </div>
 
@@ -143,22 +143,22 @@ export default function BillsTab({
 
             <div className="grid grid-cols-3 gap-2 text-center pt-1">
               <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs">
-                <span className="text-[9px] font-bold text-emerald-200 block uppercase">Belum Lunas</span>
-                <span className="text-[11px] font-extrabold text-white block mt-0.5">{formatRupiah(totalReceivableUnpaid)}</span>
+                <span className="text-[9px] font-bold text-emerald-100 block uppercase">Belum Lunas</span>
+                <span className="text-xs font-black text-white block mt-0.5">{formatRupiah(totalReceivableUnpaid)}</span>
               </div>
               <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs">
-                <span className="text-[9px] font-bold text-emerald-200 block uppercase">Sudah Cair</span>
-                <span className="text-[11px] font-extrabold text-emerald-100 block mt-0.5">{formatRupiah(totalReceivablePaid)}</span>
+                <span className="text-[9px] font-bold text-emerald-100 block uppercase">Sudah Cair</span>
+                <span className="text-xs font-black text-emerald-100 block mt-0.5">{formatRupiah(totalReceivablePaid)}</span>
               </div>
               <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs">
-                <span className="text-[9px] font-bold text-emerald-200 block uppercase">Total Piutang</span>
-                <span className="text-[11px] font-extrabold text-white block mt-0.5">{formatRupiah(totalReceivableAll)}</span>
+                <span className="text-[9px] font-bold text-emerald-100 block uppercase">Total Piutang</span>
+                <span className="text-xs font-black text-white block mt-0.5">{formatRupiah(totalReceivableAll)}</span>
               </div>
             </div>
 
             {/* Progress Bar showing collected ratio */}
             <div className="space-y-1.5 pt-1">
-              <div className="flex justify-between text-[10px] font-bold text-emerald-100">
+              <div className="flex justify-between text-[10px] font-extrabold text-emerald-100">
                 <span>Persentase Piutang Tertagih (Lunas)</span>
                 <span>{receivableCollectedPercent}%</span>
               </div>
@@ -195,22 +195,22 @@ export default function BillsTab({
 
             <div className="grid grid-cols-3 gap-2 text-center pt-1">
               <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs">
-                <span className="text-[9px] font-bold text-amber-200 block uppercase">Belum Lunas</span>
-                <span className="text-[11px] font-extrabold text-white block mt-0.5">{formatRupiah(totalDebtUnpaid)}</span>
+                <span className="text-[9px] font-bold text-amber-100 block uppercase">Belum Lunas</span>
+                <span className="text-xs font-black text-white block mt-0.5">{formatRupiah(totalDebtUnpaid)}</span>
               </div>
               <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs">
-                <span className="text-[9px] font-bold text-amber-200 block uppercase">Sudah Lunas</span>
-                <span className="text-[11px] font-extrabold text-amber-100 block mt-0.5">{formatRupiah(totalDebtPaid)}</span>
+                <span className="text-[9px] font-bold text-amber-100 block uppercase">Sudah Lunas</span>
+                <span className="text-xs font-black text-amber-100 block mt-0.5">{formatRupiah(totalDebtPaid)}</span>
               </div>
               <div className="p-2 rounded-xl bg-white/10 backdrop-blur-xs">
-                <span className="text-[9px] font-bold text-amber-200 block uppercase">Total Hutang</span>
-                <span className="text-[11px] font-extrabold text-white block mt-0.5">{formatRupiah(totalDebtAll)}</span>
+                <span className="text-[9px] font-bold text-amber-100 block uppercase">Total Hutang</span>
+                <span className="text-xs font-black text-white block mt-0.5">{formatRupiah(totalDebtAll)}</span>
               </div>
             </div>
 
             {/* Progress Bar showing paid ratio */}
             <div className="space-y-1.5 pt-1">
-              <div className="flex justify-between text-[10px] font-bold text-amber-100">
+              <div className="flex justify-between text-[10px] font-extrabold text-amber-100">
                 <span>Persentase Hutang Terbayar (Lunas)</span>
                 <span>{debtPaidPercent}%</span>
               </div>
@@ -226,22 +226,22 @@ export default function BillsTab({
       )}
 
       {/* Monthly Focus Alert Card */}
-      <div className="p-3.5 bg-gradient-to-r from-indigo-500/[0.03] to-purple-500/[0.03] border border-indigo-100/50 rounded-2xl flex items-center justify-between gap-3 shadow-3xs">
+      <div className="p-4 bg-white border border-slate-200 rounded-[22px] flex items-center justify-between gap-3 shadow-sm">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9.5 h-9.5 rounded-xl bg-indigo-50 text-indigo-650 flex items-center justify-center flex-shrink-0 animate-pulse-slow">
+          <div className="w-9.5 h-9.5 rounded-xl bg-indigo-100/70 text-indigo-650 flex items-center justify-center flex-shrink-0">
             <Calendar size={18} />
           </div>
           <div className="min-w-0">
-            <span className="text-[10.5px] font-extrabold text-indigo-500 uppercase tracking-wide">Fokus Jatuh Tempo ({currentMonthName})</span>
-            <div className="flex items-center gap-3.5 mt-1">
+            <span className="text-[10.5px] font-black text-indigo-650 uppercase tracking-wider block">Fokus Jatuh Tempo ({currentMonthName})</span>
+            <div className="flex items-center gap-4 mt-1.5">
               <div>
-                <p className="text-[9.5px] font-bold text-slate-400">Piutang Cair</p>
-                <p className="text-xs font-black text-emerald-600">{formatRupiah(unpaidReceivableThisMonth)}</p>
+                <p className="text-[9.5px] font-bold text-slate-500">Piutang Cair</p>
+                <p className="text-xs font-black text-emerald-700">{formatRupiah(unpaidReceivableThisMonth)}</p>
               </div>
               <div className="w-px h-6 bg-slate-200" />
               <div>
-                <p className="text-[9.5px] font-bold text-slate-400">Hutang Jatuh Tempo</p>
-                <p className="text-xs font-black text-amber-600">{formatRupiah(unpaidDebtThisMonth)}</p>
+                <p className="text-[9.5px] font-bold text-slate-500">Hutang Jatuh Tempo</p>
+                <p className="text-xs font-black text-amber-700">{formatRupiah(unpaidDebtThisMonth)}</p>
               </div>
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function BillsTab({
       </div>
 
       {/* Filters */}
-      <div className="grid grid-cols-4 p-1 bg-slate-100 rounded-xl">
+      <div className="grid grid-cols-4 p-1 bg-slate-200/70 border border-slate-200/30 rounded-xl shadow-2xs">
         {([
           { id: 'all', label: 'Semua' },
           { id: 'debt', label: 'Hutang' },
@@ -260,10 +260,10 @@ export default function BillsTab({
             key={item.id}
             type="button"
             onClick={() => setBillFilter(item.id)}
-            className={`py-1.5 text-xs font-bold rounded-lg cursor-pointer transition-all ${
+            className={`py-1.5 text-xs font-extrabold rounded-lg cursor-pointer transition-all ${
               billFilter === item.id 
-                ? 'bg-white text-indigo-600 shadow-2xs' 
-                : 'text-slate-500 hover:text-slate-700'
+                ? 'bg-white text-indigo-650 shadow-sm' 
+                : 'text-slate-600 hover:text-slate-800'
             }`}
           >
             {item.label}
@@ -275,14 +275,14 @@ export default function BillsTab({
       {loadingBills ? (
         <div className="space-y-3">
           {[1, 2, 3].map(n => (
-            <div key={n} className="h-16 bg-white border border-slate-100 rounded-xl animate-pulse"></div>
+            <div key={n} className="h-16 bg-white border border-slate-200 rounded-xl animate-pulse"></div>
           ))}
         </div>
       ) : sortedBills.length === 0 ? (
-        <div className="p-8 bg-white border border-slate-100 rounded-[20px] text-center">
-          <Wallet className="mx-auto text-slate-300 mb-2 animate-bounce" size={26} />
-          <p className="text-xs text-slate-500 font-bold">Tidak ada catatan tagihan</p>
-          <p className="text-xs text-slate-400 mt-0.5">Catat pinjaman atau tagihan bulanan untuk mulai memantau.</p>
+        <div className="p-8 bg-white border border-slate-200 rounded-[20px] text-center shadow-xs">
+          <Wallet className="mx-auto text-slate-400 mb-2 animate-bounce" size={26} />
+          <p className="text-xs text-slate-800 font-extrabold">Tidak ada catatan tagihan</p>
+          <p className="text-xs text-slate-500 mt-0.5">Catat pinjaman atau tagihan bulanan untuk mulai memantau.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -293,49 +293,49 @@ export default function BillsTab({
               <div 
                 key={b.id} 
                 onClick={() => setSelectedBillDetail(b)}
-                className={`p-3.5 bg-white border rounded-2xl flex items-center justify-between gap-3 shadow-2xs hover:bg-slate-50/70 transition-all cursor-pointer hover:translate-x-0.5 relative overflow-hidden ${
+                className={`p-3.5 bg-white border rounded-2xl flex items-center justify-between gap-3 shadow-sm hover:bg-slate-50/70 transition-all cursor-pointer hover:translate-x-0.5 relative overflow-hidden ${
                   b.status === 'paid' 
-                    ? 'border-slate-100 opacity-70' 
+                    ? 'border-slate-200 opacity-70' 
                     : b.type === 'debt'
-                    ? 'border-l-4 border-l-amber-400 border-slate-100'
-                    : 'border-l-4 border-l-emerald-400 border-slate-100'
+                    ? 'border-l-4 border-l-amber-400 border-slate-200'
+                    : 'border-l-4 border-l-emerald-400 border-slate-200'
                 }`}
               >
                 <div className="flex items-center gap-3.5 min-w-0 flex-1">
                   <div className={`w-9.5 h-9.5 rounded-xl flex items-center justify-center flex-shrink-0 ${
                     b.status === 'paid'
-                      ? 'bg-slate-100 text-slate-400'
+                      ? 'bg-slate-100 text-slate-500'
                       : b.type === 'debt'
-                      ? 'bg-amber-50 text-amber-500'
-                      : 'bg-emerald-50 text-emerald-600'
+                      ? 'bg-amber-50 text-amber-600 border border-amber-100/50'
+                      : 'bg-emerald-50 text-emerald-700 border border-emerald-100/50'
                   }`}>
                     {b.type === 'debt' ? <Wallet size={18} /> : <Coins size={18} />}
                   </div>
                   
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <h4 className="text-xs font-extrabold text-slate-700 truncate max-w-[150px] sm:max-w-xs">{b.title}</h4>
+                      <h4 className="text-xs font-black text-slate-800 truncate max-w-[150px] sm:max-w-xs">{b.title}</h4>
                       {b.isRecurring && (
-                        <RefreshCw size={9.5} className="text-indigo-500 animate-spin-slow flex-shrink-0" />
+                        <RefreshCw size={9.5} className="text-indigo-650 animate-spin-slow flex-shrink-0" />
                       )}
                       {b.isInstallment && (
-                        <span className="px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-650 text-[9px] font-extrabold tracking-wide border border-indigo-100/30 flex-shrink-0">
+                        <span className="px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-[9px] font-black tracking-wide border border-indigo-100/30 flex-shrink-0">
                           Cicilan {b.installmentNumber}/{b.installmentCount}
                         </span>
                       )}
                       {b.status === 'paid' && (
-                        <span className="px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-700 text-[9px] font-extrabold uppercase flex-shrink-0">Lunas</span>
+                        <span className="px-1.5 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase flex-shrink-0">Lunas</span>
                       )}
                     </div>
                     
-                    <div className="text-[11px] text-slate-400 mt-1 flex flex-col sm:flex-row sm:items-center sm:gap-2 gap-0.5 leading-tight">
-                      <span className="font-medium">{b.type === 'debt' ? `Kepada: ${b.contactName}` : `Dari: ${b.contactName}`}</span>
+                    <div className="text-[11px] text-slate-550 font-medium mt-1 flex flex-col sm:flex-row sm:items-center sm:gap-2 gap-0.5 leading-tight">
+                      <span>{b.type === 'debt' ? `Kepada: ${b.contactName}` : `Dari: ${b.contactName}`}</span>
                       {b.status === 'unpaid' ? (
-                        <span className={`${isOverdue ? 'text-rose-500 font-bold' : 'text-slate-400 font-medium'}`}>
+                        <span className={`${isOverdue ? 'text-rose-600 font-black' : 'text-slate-500 font-medium'}`}>
                           <span className="hidden sm:inline">•</span> Jatuh Tempo: {formatShortDate(b.dueDate)} {isOverdue && '⚠️ Terlambat'}
                         </span>
                       ) : (
-                        <span className="text-emerald-600 font-bold">
+                        <span className="text-emerald-700 font-bold">
                           <span className="hidden sm:inline">•</span> Lunas
                         </span>
                       )}
@@ -346,14 +346,14 @@ export default function BillsTab({
                 <div className="text-right flex-shrink-0 pl-1 flex items-center gap-2">
                   <span className={`text-xs font-black ${
                     b.status === 'paid' 
-                      ? 'text-slate-400 line-through' 
+                      ? 'text-slate-450 line-through' 
                       : b.type === 'debt' 
-                      ? 'text-amber-600' 
-                      : 'text-emerald-600'
+                      ? 'text-amber-700' 
+                      : 'text-emerald-700'
                   }`}>
                     {formatRupiah(b.amount)}
                   </span>
-                  <ChevronRight size={14} className="text-slate-300" />
+                  <ChevronRight size={14} className="text-slate-400" />
                 </div>
               </div>
             );

@@ -30,7 +30,7 @@ export default function BudgetTab({
       {loadingBudgets ? (
         <div className="space-y-3">
           {[1, 2, 3].map(n => (
-            <div key={n} className="h-20 bg-white border border-slate-100 rounded-xl animate-pulse"></div>
+            <div key={n} className="h-20 bg-white border border-slate-200 rounded-xl animate-pulse"></div>
           ))}
         </div>
       ) : (
@@ -45,19 +45,19 @@ export default function BudgetTab({
             const isNearLimit = percent >= 80;
 
             return (
-              <div key={cat.id} className="p-4 bg-white border border-slate-100 rounded-2xl space-y-3.5 shadow-2xs">
+              <div key={cat.id} className="p-4.5 bg-white border border-slate-200 rounded-[22px] space-y-3.5 shadow-sm">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3">
                     <div className={`w-8.5 h-8.5 rounded-xl ${cat.color} flex items-center justify-center flex-shrink-0`}>
                       <DynamicIcon name={cat.icon} size={16} />
                     </div>
-                    <h3 className="text-xs font-extrabold text-slate-700">{cat.name}</h3>
+                    <h3 className="text-xs font-black text-slate-800">{cat.name}</h3>
                   </div>
 
                   {!isEditing && (
                     <button 
                       onClick={() => setEditingBudget({ categoryId: cat.id, limit: limit > 0 ? limit.toString() : '' })}
-                      className="text-xs font-bold text-indigo-500 hover:bg-indigo-50 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                      className="text-xs font-extrabold text-indigo-650 hover:bg-indigo-50/80 px-2.5 py-1.5 rounded-lg border border-indigo-100/60 shadow-2xs transition-all cursor-pointer"
                     >
                       {limit > 0 ? 'Edit Batas' : '+ Atur Batas'}
                     </button>
@@ -65,8 +65,8 @@ export default function BudgetTab({
                 </div>
 
                 {isEditing && (
-                  <div className="flex items-center justify-between gap-3 bg-slate-50/70 p-2.5 rounded-xl border border-slate-100 animate-scale-in">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Batas:</span>
+                  <div className="flex items-center justify-between gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200 shadow-2xs animate-scale-in">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Batas:</span>
                     <div className="flex items-center gap-2">
                       <div className="relative">
                         <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">Rp</span>
@@ -80,7 +80,7 @@ export default function BudgetTab({
                       </div>
                       <button 
                         onClick={() => handleBudgetEditSubmit(cat.id)}
-                        className="p-2 rounded-lg bg-indigo-500 text-white hover:bg-indigo-600 active:scale-95 cursor-pointer flex items-center justify-center shadow-xs"
+                        className="p-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-750 active:scale-95 cursor-pointer flex items-center justify-center shadow-xs"
                         title="Simpan"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-3.5 h-3.5">
@@ -89,7 +89,7 @@ export default function BudgetTab({
                       </button>
                       <button 
                         onClick={() => setEditingBudget(null)}
-                        className="p-2 rounded-lg bg-white text-slate-400 border border-slate-200 hover:bg-slate-50 active:scale-95 cursor-pointer flex items-center justify-center"
+                        className="p-2 rounded-lg bg-white text-slate-400 border border-slate-200 hover:bg-slate-55 active:scale-95 cursor-pointer flex items-center justify-center"
                         title="Batal"
                       >
                         <X size={14} />
@@ -99,7 +99,7 @@ export default function BudgetTab({
                 )}
 
                 {isEditing && editingBudget.limit && (
-                  <div className="text-xs text-indigo-500 font-bold text-right -mt-1 animate-scale-in">
+                  <div className="text-xs text-indigo-600 font-extrabold text-right -mt-1 animate-scale-in">
                     Format: {getLivePreviewText(editingBudget.limit)}
                   </div>
                 )}
@@ -107,37 +107,37 @@ export default function BudgetTab({
                 {limit > 0 ? (
                   <div className="space-y-2.5">
                     <div className="flex justify-between items-end">
-                      <span className="text-[11px] text-slate-400">
-                        Terpakai: <span className="font-extrabold text-slate-600">{formatRupiah(spent)}</span>
+                      <span className="text-[11px] text-slate-500 font-medium">
+                        Terpakai: <span className="font-extrabold text-slate-800">{formatRupiah(spent)}</span>
                       </span>
-                      <span className={`text-[11px] font-extrabold ${isNearLimit ? 'text-rose-500' : 'text-indigo-500'}`}>
+                      <span className={`text-[11px] font-black ${isNearLimit ? 'text-rose-650' : 'text-indigo-650'}`}>
                         {formatRupiah(limit)} ({percent}%)
                       </span>
                     </div>
 
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                       <div 
                         className={`h-full rounded-full transition-all duration-500 ${
-                          percent >= 100 ? 'bg-red-400 animate-pulse' : isNearLimit ? 'bg-amber-400' : 'bg-indigo-400'
+                          percent >= 100 ? 'bg-rose-500 animate-pulse' : isNearLimit ? 'bg-amber-500' : 'bg-indigo-600'
                         }`}
                         style={{ width: `${percent}%` }}
                       ></div>
                     </div>
 
                     {percent >= 100 ? (
-                      <div className="flex items-center gap-1.5 text-rose-500 bg-rose-50/70 p-2 rounded-lg text-[11px] font-bold">
-                        <AlertCircle size={12} className="flex-shrink-0" />
+                      <div className="flex items-center gap-1.5 text-rose-700 bg-rose-50 border border-rose-100 p-2.5 rounded-xl text-[11px] font-extrabold">
+                        <AlertCircle size={12} className="flex-shrink-0 text-rose-500" />
                         <span>Batas anggaran terlampaui! Rem belanja kategori ini.</span>
                       </div>
                     ) : isNearLimit ? (
-                      <div className="flex items-center gap-1.5 text-amber-600 bg-amber-50/70 p-2 rounded-lg text-[11px] font-bold">
-                        <AlertCircle size={12} className="flex-shrink-0" />
+                      <div className="flex items-center gap-1.5 text-amber-700 bg-amber-50 border border-amber-100 p-2.5 rounded-xl text-[11px] font-extrabold">
+                        <AlertCircle size={12} className="flex-shrink-0 text-amber-500" />
                         <span>Pengeluaran mendekati batas limit (diatas 80%).</span>
                       </div>
                     ) : null}
                   </div>
                 ) : (
-                  <div className="text-[11px] text-slate-400 bg-slate-50/50 p-3 rounded-xl border border-dashed border-slate-200 text-center">
+                  <div className="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl border border-dashed border-slate-200 text-center font-medium">
                     Belum ada batas anggaran untuk kategori ini.
                   </div>
                 )}

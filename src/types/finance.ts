@@ -1,5 +1,12 @@
 export type TransactionType = 'income' | 'expense';
 
+export interface Account {
+  id: string;
+  name: string;
+  type: 'bank' | 'wallet' | 'cash';
+  icon: string; // Lucide icon name
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -15,8 +22,10 @@ export interface Transaction {
   amount: number;
   type: TransactionType;
   categoryId: string;
+  accountId?: string; // Link to the Account
   date: string; // YYYY-MM-DD
   notes?: string;
+  billId?: string; // Link to the Bill/Debt
 }
 
 export interface Budget {
