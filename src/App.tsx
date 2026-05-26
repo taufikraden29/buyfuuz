@@ -18,7 +18,8 @@ import {
   Calendar,
   ChevronRight,
   Copy,
-  Bell
+  Bell,
+  Shield
 } from 'lucide-react';
 import { api, CATEGORIES } from './services/api';
 import DynamicIcon from './components/DynamicIcon';
@@ -1150,6 +1151,18 @@ export default function App() {
                       <h4 className="text-[11px] font-black uppercase tracking-wider text-indigo-700">Penyimpanan Lokal (Local Storage)</h4>
                       <p className="text-[11px] text-indigo-650 mt-1 leading-relaxed font-medium">
                         Seluruh data pencatatan Anda tersimpan aman di dalam browser perangkat ini dan dapat di-reset kembali ke demo awal kapan saja.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl shadow-3xs">
+                  <div className="flex gap-2">
+                    <Shield size={16} className="shrink-0 mt-0.5 text-emerald-650" />
+                    <div>
+                      <h4 className="text-[11px] font-black uppercase tracking-wider text-emerald-700">Komitmen Privasi & Keamanan</h4>
+                      <p className="text-[11px] text-emerald-650 mt-1 leading-relaxed font-medium">
+                        Aplikasi ini <strong>tidak mengumpulkan data pribadi Anda</strong>. Seluruh data keuangan Anda diolah secara offline dan hanya tersimpan secara lokal di perangkat Anda sendiri.
                       </p>
                     </div>
                   </div>
