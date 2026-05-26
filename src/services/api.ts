@@ -9,6 +9,7 @@ const INITIAL_CATEGORIES: Category[] = [
   { id: 'cat-kesehatan', name: 'Kesehatan', icon: 'HeartPulse', color: 'bg-rose-50 text-rose-500 border border-rose-200', hexColor: '#f43f5e', type: 'expense' },
   { id: 'cat-gaji', name: 'Gaji Bulanan', icon: 'Coins', color: 'bg-emerald-50 text-emerald-600 border border-emerald-200', hexColor: '#10b981', type: 'income' },
   { id: 'cat-investasi', name: 'Investasi', icon: 'TrendingUp', color: 'bg-indigo-50 text-indigo-500 border border-indigo-200', hexColor: '#6366f1', type: 'both' },
+  { id: 'cat-transfer', name: 'Transfer Dana', icon: 'RefreshCw', color: 'bg-indigo-50 text-indigo-650 border border-indigo-200', hexColor: '#6366f1', type: 'both' },
   { id: 'cat-lainnya', name: 'Lain-lain', icon: 'HelpCircle', color: 'bg-slate-50 text-slate-500 border border-slate-200', hexColor: '#64748b', type: 'both' },
 ];
 
@@ -81,6 +82,20 @@ const seedData = () => {
 
   if (!localStorage.getItem(categoriesKey)) {
     setStorageItem(categoriesKey, INITIAL_CATEGORIES);
+  } else {
+    // Dynamically inject transfer category if missing in user's existing data
+    const existingCategories = getStorageItem<Category[]>(categoriesKey, []);
+    if (!existingCategories.some(c => c.id === 'cat-transfer')) {
+      existingCategories.push({
+        id: 'cat-transfer',
+        name: 'Transfer Dana',
+        icon: 'RefreshCw',
+        color: 'bg-indigo-50 text-indigo-650 border border-indigo-200',
+        hexColor: '#6366f1',
+        type: 'both'
+      });
+      setStorageItem(categoriesKey, existingCategories);
+    }
   }
 
   if (!localStorage.getItem(accountsKey)) {
@@ -172,6 +187,13 @@ export const api = {
         await api.updateBillStatus(txToDelete.billId, 'unpaid');
         return true;
       }
+    }
+
+    // Cascade delete linked transfer transaction if transferId is present
+    if (txToDelete && txToDelete.transferId) {
+      const filtered = transactions.filter(t => t.id !== id && t.transferId !== txToDelete.transferId);
+      setStorageItem('finance_transactions', filtered);
+      return true;
     }
 
     const filtered = transactions.filter(t => t.id !== id);

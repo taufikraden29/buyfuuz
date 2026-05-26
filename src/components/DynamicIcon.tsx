@@ -9,7 +9,7 @@ interface DynamicIconProps {
 
 export const DynamicIcon: React.FC<DynamicIconProps> = ({ name, className = '', size = 20 }) => {
   // Safe lookup for icon component
-  const IconComponent = (Icons as any)[name];
+  const IconComponent = (Icons as unknown as Record<string, React.ComponentType<{ className?: string; size?: number }>>)[name];
   
   if (!IconComponent) {
     // Fallback icon if not found

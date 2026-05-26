@@ -26,6 +26,7 @@ export interface Transaction {
   date: string; // YYYY-MM-DD
   notes?: string;
   billId?: string; // Link to the Bill/Debt
+  transferId?: string; // Link to the associated transfer transaction
 }
 
 export interface Budget {

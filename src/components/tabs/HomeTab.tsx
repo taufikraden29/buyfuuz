@@ -8,7 +8,7 @@ import {
   ChevronRight, 
   Sparkles 
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { CATEGORIES } from '../../services/api';
 import DynamicIcon from '../DynamicIcon';
 import { formatRupiah, formatShortDate } from '../../utils/financeHelpers';
@@ -22,7 +22,16 @@ interface HomeTabProps {
   loadingBudgets: boolean;
   setCurrentTab: (tab: string) => void;
   setSelectedTxDetail: (tx: Transaction | null) => void;
+  userName: string;
 }
+
+const FINANCIAL_TIPS = [
+  "Membeli barang diskon yang sebenarnya tidak dibutuhkan tetap merupakan pemborosan uang! 💸",
+  "Gunakan rumus 50-30-20: 50% untuk kebutuhan utama, 30% keinginan, dan 20% tabungan/investasi. 📊",
+  "Catat setiap pengeluaran kecil, karena tetesan air kecil pun bisa menenggelamkan kapal besar! 💧",
+  "Sebelum membeli barang non-primer, tunggu 24 jam untuk memastikan Anda benar-benar membutuhkannya. ⏱️",
+  "Kunci kaya bukan seberapa besar gaji Anda, tapi seberapa pintar Anda mempertahankan dan mengalokasikannya. 🗝️"
+];
 
 export default function HomeTab({
   transactions,
@@ -31,15 +40,16 @@ export default function HomeTab({
   loadingTxs,
   loadingBudgets,
   setCurrentTab,
-  setSelectedTxDetail
+  setSelectedTxDetail,
+  userName
 }: HomeTabProps) {
   // Calculations
   const totalIncome = transactions
-    .filter(t => t.type === 'income')
+    .filter(t => t.type === 'income' && t.categoryId !== 'cat-transfer')
     .reduce((sum, t) => sum + t.amount, 0);
 
   const totalExpense = transactions
-    .filter(t => t.type === 'expense')
+    .filter(t => t.type === 'expense' && t.categoryId !== 'cat-transfer')
     .reduce((sum, t) => sum + t.amount, 0);
 
   const currentBalance = totalIncome - totalExpense;
@@ -59,7 +69,7 @@ export default function HomeTab({
 
   // Weekly Unusual Spendings Anomaly Detection helper
   const getUnusualSpendings = () => {
-    const expenseTxs = transactions.filter(t => t.type === 'expense');
+    const expenseTxs = transactions.filter(t => t.type === 'expense' && t.categoryId !== 'cat-transfer');
     if (expenseTxs.length < 3) return []; // need baseline data points to establish standard deviation
 
     const totalAmt = expenseTxs.reduce((sum, t) => sum + t.amount, 0);
@@ -88,6 +98,11 @@ export default function HomeTab({
   // Active Slide Index for dynamic horizontal insights carousel
   const [activeSlide, setActiveSlide] = useState(0);
 
+  // Assistant Speech Mode: 'status' (Financial State Review), 'mission' (Weekly Quest), 'tip' (Motivating Tip)
+  const [speechMode, setSpeechMode] = useState<'status' | 'mission' | 'tip'>('status');
+
+
+
   // Get premium structural advice when budgets are exceeded or critical
   const getBudgetAdvice = () => {
     const activeBudgets = budgets.filter(b => b.limit > 0);
@@ -104,7 +119,7 @@ export default function HomeTab({
         spent: firstOver.spent,
         overAmount: firstOver.spent - firstOver.limit,
         title: 'Darurat Anggaran! 🚨',
-        message: `Anggaran ${cat?.name || 'Kategori'} Anda bocor ${formatRupiah(firstOver.spent - firstOver.limit)}. Hentikan segera belanja impulsif pada pos ini!`,
+        message: `Anggaran ${cat?.name || 'Kategori'} ${userName || 'Kak'} bocor ${formatRupiah(firstOver.spent - firstOver.limit)}. Hentikan segera belanja impulsif pada pos ini!`,
         advice: '💡 Tindakan Mandiri: Tutup deficit dengan cara memindahkan sisa alokasi kuota dari pos belanja lain yang masih hijau, atau tunda belanja hingga awal bulan depan.'
       };
     }
@@ -119,7 +134,7 @@ export default function HomeTab({
         spent: firstWarn.spent,
         remaining: firstWarn.limit - firstWarn.spent,
         title: 'Limit Anggaran Tipis! 🔔',
-        message: `Dompet kategori ${cat?.name || 'Kategori'} sudah terpakai ${Math.round((firstWarn.spent / firstWarn.limit) * 100)}%. Sisa saku aman Anda hanya ${formatRupiah(firstWarn.limit - firstWarn.spent)}.`,
+        message: `Dompet kategori ${cat?.name || 'Kategori'} sudah terpakai ${Math.round((firstWarn.spent / firstWarn.limit) * 100)}%. Sisa saku aman ${userName || 'Kak'} hanya ${formatRupiah(firstWarn.limit - firstWarn.spent)}.`,
         advice: '💡 Tindakan Mandiri: Aktifkan rem belanja. Gunakan pilihan alternatif hemat, dan prioritaskan kebutuhan primer saja hingga siklus anggaran berganti.'
       };
     }
@@ -128,6 +143,93 @@ export default function HomeTab({
   };
 
   const budgetAdvice = getBudgetAdvice();
+
+  // 1. Calculate Companion Financial Expression
+  const companionStatus = useMemo<'happy' | 'worried' | 'normal'>(() => {
+    if (budgetAdvice?.type === 'danger') return 'worried';
+    if (savingRate >= 40 && totalIncome > 0) return 'happy';
+    return 'normal';
+  }, [budgetAdvice, savingRate, totalIncome]);
+
+  // 2. Generate Active Weekly Mission (Evaluated dynamically over the last 7 days)
+  const activeMission = useMemo(() => {
+    const today = new Date();
+    // Get week number of the year
+    const startOfYear = new Date(today.getFullYear(), 0, 1);
+    const pastDaysOfYear = (today.getTime() - startOfYear.getTime()) / 86400000;
+    const weekNumber = Math.ceil((pastDaysOfYear + startOfYear.getDay() + 1) / 7);
+
+    // Pick mission index based on week number
+    const missionIndex = weekNumber % 3;
+
+    // Range for last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    if (missionIndex === 0) {
+      // Mission 1: Belanja Hemat
+      const spent = transactions
+        .filter(t => t.type === 'expense' && t.categoryId === 'cat-belanja' && new Date(t.date) >= sevenDaysAgo)
+        .reduce((sum, t) => sum + t.amount, 0);
+      const target = 150000;
+      return {
+        id: 'mission-belanja',
+        title: 'Misi Belanja Hemat 🎯',
+        description: 'Batasi pengeluaran kategori Belanja maksimal Rp 150.000 dalam 7 hari terakhir.',
+        spent,
+        target,
+        isSuccess: spent <= target,
+        categoryName: 'Belanja'
+      };
+    } else if (missionIndex === 1) {
+      // Mission 2: Kurangi Jajan
+      const spent = transactions
+        .filter(t => t.type === 'expense' && t.categoryId === 'cat-makanan' && new Date(t.date) >= sevenDaysAgo)
+        .reduce((sum, t) => sum + t.amount, 0);
+      const target = 250000;
+      return {
+        id: 'mission-jajan',
+        title: 'Misi Kurangi Jajan 🍔',
+        description: 'Batasi jajan makanan & minuman maksimal Rp 250.000 dalam 7 hari terakhir.',
+        spent,
+        target,
+        isSuccess: spent <= target,
+        categoryName: 'Makanan & Minuman'
+      };
+    } else {
+      // Mission 3: Disiplin Pengeluaran
+      const spent = transactions
+        .filter(t => t.type === 'expense' && t.categoryId !== 'cat-transfer' && new Date(t.date) >= sevenDaysAgo)
+        .reduce((sum, t) => sum + t.amount, 0);
+      const target = 750000;
+      return {
+        id: 'mission-total',
+        title: 'Misi Disiplin Saku 🛡️',
+        description: 'Batasi pengeluaran total (selain transfer) maksimal Rp 750.000 dalam 7 hari terakhir.',
+        spent,
+        target,
+        isSuccess: spent <= target,
+        categoryName: 'Semua Kategori'
+      };
+    }
+  }, [transactions]);
+
+
+
+  // Pick tip based on day of month to keep it stable per day
+  const dailyTip = useMemo(() => {
+    const day = new Date().getDate();
+    return FINANCIAL_TIPS[day % FINANCIAL_TIPS.length];
+  }, []);
+
+  const cycleSpeechMode = () => {
+    setSpeechMode(prev => {
+      if (prev === 'status') return 'mission';
+      if (prev === 'mission') return 'tip';
+      return 'status';
+    });
+  };
 
   // --- CALCULATE WEEKLY TRENDS ---
   const getWeeklyComparisonInsight = () => {
@@ -143,7 +245,7 @@ export default function HomeTab({
     fourteenDaysAgo.setHours(0, 0, 0, 0);
 
     const thisWeek = transactions
-      .filter(t => t.type === 'expense')
+      .filter(t => t.type === 'expense' && t.categoryId !== 'cat-transfer')
       .filter(t => {
         const d = new Date(t.date);
         return d >= sevenDaysAgo && d <= today;
@@ -151,7 +253,7 @@ export default function HomeTab({
       .reduce((sum, t) => sum + t.amount, 0);
 
     const lastWeek = transactions
-      .filter(t => t.type === 'expense')
+      .filter(t => t.type === 'expense' && t.categoryId !== 'cat-transfer')
       .filter(t => {
         const d = new Date(t.date);
         return d >= fourteenDaysAgo && d < sevenDaysAgo;
@@ -189,7 +291,7 @@ export default function HomeTab({
             </div>
             
             <p className="text-[11px] text-slate-300 leading-snug">
-              Ada <span className="text-indigo-200 font-extrabold">{unusualSpendings.length} transaksi tidak biasa</span> yang jauh melebihi pengeluaran rata-rata Anda:
+              Ada <span className="text-indigo-200 font-extrabold">{unusualSpendings.length} transaksi tidak biasa</span> yang jauh melebihi pengeluaran rata-rata {userName || 'Kak'}:
             </p>
 
             <div className="grid grid-cols-1 gap-1.5 mt-1">
@@ -219,7 +321,7 @@ export default function HomeTab({
           </div>
           
           <p className="text-[9px] text-slate-300 italic leading-snug pt-1.5 border-t border-white/[0.05]">
-            💡 Tip: Rem pembelian impulsif besar di luar anggaran mingguan Anda.
+            💡 Tip: Rem pembelian impulsif besar di luar anggaran mingguan {userName || 'Kak'}.
           </p>
         </div>
       )
@@ -298,21 +400,21 @@ export default function HomeTab({
               Pengeluaran minggu ini sebesar <span className="font-extrabold text-white">{formatRupiah(thisWeekExpenses)}</span>.
               {lastWeekExpenses > 0 ? (
                 <span>
-                  {' '}Dibandingkan minggu lalu ({formatRupiah(lastWeekExpenses)}), belanja Anda{' '}
+                  {' '}Dibandingkan minggu lalu ({formatRupiah(lastWeekExpenses)}), belanja {userName || 'Kak'}{' '}
                   <span className={`font-black ${isIncrease ? 'text-rose-250' : 'text-emerald-250'}`}>
                     {isIncrease ? `meningkat ${percentDiff}%` : `menghemat ${Math.abs(percentDiff)}%`}
                   </span>.
                 </span>
               ) : (
-                ' Mulai pertahankan pengeluaran agar tetap seimbang dengan pemasukan Anda.'
+                ` Mulai pertahankan pengeluaran agar tetap seimbang dengan pemasukan ${userName || 'Kak'}.`
               )}
             </p>
           </div>
           
           <p className="text-[9.5px] text-slate-300 font-semibold leading-snug pt-1.5 border-t border-white/[0.05] italic">
             {isIncrease 
-              ? '💡 Tip: Telusuri riwayat belanja Anda minggu ini dan batasi transaksi non-primer agar saldo stabil.'
-              : '💡 Tip: Bagus sekali! Penghematan minggu ini bisa dialokasikan untuk menambah target tabungan Anda.'
+              ? `💡 Tip: Telusuri riwayat belanja ${userName || 'Kak'} minggu ini dan batasi transaksi non-primer agar saldo stabil.`
+              : `💡 Tip: Bagus sekali! Penghematan minggu ini bisa dialokasikan untuk menambah target tabungan ${userName || 'Kak'}.`
             }
           </p>
         </div>
@@ -342,12 +444,12 @@ export default function HomeTab({
             </div>
             
             <p className="text-[11.5px] text-slate-300 leading-snug">
-              Selamat datang di asisten finansial Anda! Mulai catat pemasukan bulanan dan pengeluaran harian secara rutin untuk mengaktifkan grafik mingguan dan analisis keuangan otomatis.
+              Selamat datang, Kak {userName || 'Kawan'}! Mulai catat pemasukan bulanan dan pengeluaran harian secara rutin untuk mengaktifkan grafik mingguan dan analisis keuangan otomatis.
             </p>
           </div>
           
           <p className="text-[9.5px] text-indigo-200 font-semibold leading-snug pt-1.5 border-t border-white/[0.05] italic">
-            💡 Tip: Atur anggaran batas per kategori belanja di tab Anggaran agar pengeluaran Anda tetap terkontrol.
+            💡 Tip: Atur anggaran batas per kategori belanja di tab Anggaran agar pengeluaran {userName || 'Kak'} tetap terkontrol.
           </p>
         </div>
       )
@@ -374,7 +476,7 @@ export default function HomeTab({
     if (totalExpense > totalIncome && totalIncome > 0) {
       return {
         title: 'Dompet Defisit! ⚠️',
-        message: `Pengeluaran Anda melebihi pemasukan sebesar ${formatRupiah(totalExpense - totalIncome)}. Coba batasi belanja non-primer dan amankan pos pengeluaran.`,
+        message: `Pengeluaran ${userName || 'Kak'} melebihi pemasukan sebesar ${formatRupiah(totalExpense - totalIncome)}. Coba batasi belanja non-primer dan amankan pos pengeluaran.`,
         color: 'bg-rose-50 border-rose-200 text-rose-700',
         icon: AlertCircle
       };
@@ -384,7 +486,7 @@ export default function HomeTab({
       const catNames = overBudgets.map(b => CATEGORIES.find(c => c.id === b.categoryId)?.name || '').filter(Boolean);
       return {
         title: 'Anggaran Melampaui Batas! 🚨',
-        message: `Anda telah melebihi batas anggaran untuk kategori: ${catNames.join(', ')}. Tunda pengeluaran ini hingga bulan berikutnya.`,
+        message: `${userName || 'Kak'} telah melebihi batas anggaran untuk kategori: ${catNames.join(', ')}. Tunda pengeluaran ini hingga bulan berikutnya.`,
         color: 'bg-pink-50 border-pink-200 text-pink-700',
         icon: AlertCircle
       };
@@ -403,7 +505,7 @@ export default function HomeTab({
     if (savingRate >= 40 && totalIncome > 0) {
       return {
         title: 'Kesehatan Dompet: Sangat Sehat! 🌟',
-        message: `Hebat! Anda berhasil menabung ${Math.round(savingRate)}% dari pemasukan. Teruskan performa luar biasa ini untuk dana darurat Anda.`,
+        message: `Hebat! ${userName || 'Kak'} berhasil menabung ${Math.round(savingRate)}% dari pemasukan. Teruskan performa luar biasa ini untuk dana darurat ${userName || 'Kak'}.`,
         color: 'bg-emerald-50 border-emerald-200 text-emerald-700',
         icon: Lightbulb
       };
@@ -412,14 +514,14 @@ export default function HomeTab({
     if (savingRate > 0 && totalIncome > 0) {
       return {
         title: 'Kondisi Keuangan: Stabil 📈',
-        message: `Anda menyisihkan ${Math.round(savingRate)}% dari pemasukan. Tingkatkan porsi tabungan dengan mengurangi jajan atau pengeluaran impulsif.`,
+        message: `${userName || 'Kak'} menyisihkan ${Math.round(savingRate)}% dari pemasukan. Tingkatkan porsi tabungan dengan mengurangi jajan atau pengeluaran impulsif.`,
         color: 'bg-blue-50 border-blue-200 text-blue-700',
         icon: Lightbulb
       };
     }
 
     return {
-      title: 'Catat Pemasukan Anda 💵',
+      title: `Catat Pemasukan ${userName || 'Kak'} 💵`,
       message: 'Belum ada pemasukan yang dicatat. Masukkan pemasukan bulanan agar analisis rasio tabungan dapat berfungsi.',
       color: 'bg-slate-50 border-slate-200 text-slate-650',
       icon: Info
@@ -439,7 +541,7 @@ export default function HomeTab({
       const dateStr = d.toISOString().split('T')[0];
       
       const dayExpense = transactions
-        .filter(t => t.type === 'expense' && t.date === dateStr)
+        .filter(t => t.type === 'expense' && t.categoryId !== 'cat-transfer' && t.date === dateStr)
         .reduce((sum, t) => sum + t.amount, 0);
       
       dataPoints.push({
@@ -481,13 +583,155 @@ export default function HomeTab({
 
   return (
     <div className="space-y-5 animate-slide-up">
+      {/* Greeting Header with Onboarding Character & Speech Bubble */}
+      <div className="bg-white rounded-[24px] border border-slate-200 shadow-3xs overflow-hidden transition-all duration-300">
+        <div className="p-4 flex items-center justify-between border-b border-slate-100 bg-slate-50/50">
+          <div className="flex items-center gap-3">
+            {/* Avatar container with animation */}
+            <div 
+              onClick={cycleSpeechMode}
+              className={`w-12 h-12 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center flex-shrink-0 relative cursor-pointer active:scale-95 transition-all overflow-hidden ${
+                companionStatus === 'happy' 
+                  ? 'animate-bounce-gentle' 
+                  : companionStatus === 'worried' 
+                  ? 'animate-wiggle' 
+                  : ''
+              }`}
+            >
+              <img src="/character-open.svg" alt="Asisten Finansial" className="w-14 h-14 object-contain translate-y-3 scale-135" />
+              {companionStatus === 'worried' && (
+                <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-rose-500 rounded-full border-2 border-white flex items-center justify-center">
+                  <span className="text-[8px] font-black text-white">!</span>
+                </div>
+              )}
+              {companionStatus === 'happy' && (
+                <div className="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center animate-pulse">
+                  <span className="text-[8px] font-black text-white">✨</span>
+                </div>
+              )}
+            </div>
+            <div>
+              <h3 className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Halo, Kak</h3>
+              <h2 className="text-[15px] font-black text-slate-800 leading-none mt-0.5">{userName || 'Kawan'} 👋</h2>
+            </div>
+          </div>
+
+          {/* Quick status pill */}
+          <button
+            onClick={cycleSpeechMode}
+            className={`px-3 py-1.5 rounded-xl border text-[9.5px] font-black cursor-pointer transition-all active:scale-95 flex items-center gap-1.5 ${
+              companionStatus === 'happy'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                : companionStatus === 'worried'
+                ? 'bg-rose-50 border-rose-200 text-rose-700 animate-pulse'
+                : 'bg-indigo-50 border-indigo-100 text-indigo-700'
+            }`}
+          >
+            <Sparkles size={11} />
+            <span>Mode: {speechMode === 'status' ? 'Status' : speechMode === 'mission' ? 'Misi' : 'Tips'}</span>
+          </button>
+        </div>
+
+        {/* Speech Bubble / Interactive Area */}
+        <div className="p-4 bg-white relative">
+          {/* Triangular pointer */}
+          <div className="absolute -top-1.5 left-8 w-3 h-3 bg-white border-t border-l border-slate-100 rotate-45"></div>
+
+          <div className="space-y-2.5">
+            {/* Mode Content */}
+            {speechMode === 'status' && (
+              <div className="animate-scale-in">
+                {companionStatus === 'happy' ? (
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold text-slate-700 leading-relaxed">
+                      "Wah hebat sekali, <span className="font-extrabold text-emerald-650">{userName || 'Kak'}</span>! Rasio tabungan Kakak bulan ini sehat sekali mencapai <span className="font-black">{savingRate.toFixed(0)}%</span>! Dompet aman terkendali. Pertahankan terus kebiasaan hemat ini ya! 🌟"
+                    </p>
+                  </div>
+                ) : companionStatus === 'worried' ? (
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold text-slate-700 leading-relaxed">
+                      "Aduh gawat, <span className="font-extrabold text-rose-650">{userName || 'Kak'}</span>! Anggaran pos <span className="font-black text-rose-700 underline">{budgetAdvice?.categoryName}</span> jebol sebesar <span className="font-black">{formatRupiah(budgetAdvice?.overAmount || 0)}</span>! Yuk tunda belanja di pos ini dulu. ⚠️"
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold text-slate-700 leading-relaxed">
+                      "Halo <span className="font-extrabold text-indigo-650">{userName || 'Kak'}</span>, keuanganmu hari ini berada di posisi seimbang. Pastikan setiap pengeluaran kecil dicatat secara rapi agar tidak bocor ya! 📝"
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {speechMode === 'mission' && (
+              <div className="space-y-2 animate-scale-in">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-black text-indigo-850">{activeMission.title}</h4>
+                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                    activeMission.isSuccess ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                  }`}>
+                    {activeMission.isSuccess ? 'Aman ✅' : 'Bocor ⚠️'}
+                  </span>
+                </div>
+                <p className="text-[11px] font-medium text-slate-555 leading-snug">
+                  {activeMission.description}
+                </p>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px] font-bold text-slate-500">
+                    <span>Terpakai: {formatRupiah(activeMission.spent)}</span>
+                    <span>Batas: {formatRupiah(activeMission.target)}</span>
+                  </div>
+                  {/* Progress Bar */}
+                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        activeMission.isSuccess ? 'bg-emerald-500' : 'bg-rose-500'
+                      }`}
+                      style={{ width: `${Math.min(100, (activeMission.spent / activeMission.target) * 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {speechMode === 'tip' && (
+              <div className="animate-scale-in">
+                <div className="flex items-center gap-1.5 text-indigo-850 font-black text-xs mb-1">
+                  <Lightbulb size={13} className="text-amber-500" />
+                  <span>Tips Hemat Hari Ini</span>
+                </div>
+                <p className="text-xs font-semibold text-slate-700 italic leading-relaxed">
+                  "{dailyTip}"
+                </p>
+              </div>
+            )}
+
+            {/* Navigation buttons */}
+            <div className="flex justify-between items-center border-t border-slate-100 pt-2.5 mt-2.5">
+              <span className="text-[10px] text-slate-400 font-extrabold">
+                {speechMode === 'status' ? '1 dari 3: Status' : speechMode === 'mission' ? '2 dari 3: Misi' : '3 dari 3: Tips'}
+              </span>
+              <button 
+                type="button"
+                onClick={cycleSpeechMode}
+                className="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-[10.5px] font-black text-indigo-700 cursor-pointer active:scale-95 transition-all flex items-center gap-1 shadow-3xs"
+              >
+                <span>Lanjut</span>
+                <ChevronRight size={11} strokeWidth={2.5} />
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
       {/* Balance Card */}
       <div className="p-5 rounded-[24px] bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 text-white shadow-xl shadow-indigo-100/50 relative overflow-hidden">
         <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full translate-x-8 -translate-y-8 blur-xl"></div>
         <div className="absolute left-0 bottom-0 w-24 h-24 bg-purple-500/20 rounded-full -translate-x-6 translate-y-6 blur-lg"></div>
 
         <div className="relative z-10">
-          <span className="text-xs font-bold tracking-wider uppercase opacity-90">Total Saldo Anda</span>
+          <span className="text-xs font-bold tracking-wider uppercase opacity-90">Total Saldo {userName || 'Kak'}</span>
           <h2 className="text-3xl font-extrabold mt-1 tracking-tight">
             {loadingTxs ? (
               <span className="inline-block w-40 h-8 bg-white/20 animate-pulse rounded"></span>
@@ -760,7 +1004,7 @@ export default function HomeTab({
         ) : transactions.length === 0 ? (
           <div className="p-5 rounded-2xl bg-white border border-slate-100 text-center">
             <Sparkles className="mx-auto text-indigo-300 mb-2 animate-bounce" size={24} />
-            <p className="text-xs text-slate-500 font-semibold">Mulai catat transaksi Anda hari ini!</p>
+            <p className="text-xs text-slate-550 font-semibold">Mulai catat transaksi {userName || 'Kak'} hari ini!</p>
             <p className="text-[10px] text-slate-400 mt-0.5">Semua data tersimpan otomatis di perangkat.</p>
           </div>
         ) : (

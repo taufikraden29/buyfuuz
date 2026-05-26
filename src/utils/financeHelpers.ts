@@ -5,10 +5,24 @@ export const formatRupiah = (value: number) => {
   return `Rp ${value.toLocaleString('id-ID')}`;
 };
 
+// Helper to strip non-digit characters from currency strings
+export const cleanCurrencyString = (value: string): string => {
+  return value.replace(/\D/g, '');
+};
+
+// Helper to format raw inputs dynamically to localized thousands separators
+export const formatCurrencyInput = (value: string): string => {
+  const clean = cleanCurrencyString(value);
+  if (!clean) return '';
+  const num = Number(clean);
+  return num.toLocaleString('id-ID');
+};
+
 // Helper to format currency prefix for live inputs
 export const getLivePreviewText = (value: string) => {
-  const num = Number(value);
-  if (!value || isNaN(num)) return '';
+  const clean = cleanCurrencyString(value);
+  if (!clean) return '';
+  const num = Number(clean);
   return formatRupiah(num);
 };
 

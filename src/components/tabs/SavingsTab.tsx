@@ -11,6 +11,7 @@ interface SavingsTabProps {
   setFundAmount: (amt: string) => void;
   openConfirm: (title: string, message: string, onConfirm: () => void) => void;
   onDeleteGoal: (id: string) => void;
+  userName: string;
 }
 
 export default function SavingsTab({
@@ -20,7 +21,8 @@ export default function SavingsTab({
   setFundType,
   setFundAmount,
   openConfirm,
-  onDeleteGoal
+  onDeleteGoal,
+  userName
 }: SavingsTabProps) {
   // Simulator States
   const [simTarget, setSimTarget] = useState('10000000');
@@ -33,11 +35,11 @@ export default function SavingsTab({
   const perWeek = Math.round(targetVal / (monthsVal * 4.33));
   const perDay = Math.round(targetVal / (monthsVal * 30));
 
-  let tipText = 'Target cukup menantang! Pastikan untuk mengatur ulang anggaran bulanan Anda agar seimbang. 📈';
+  let tipText = `Target cukup menantang! Pastikan untuk mengatur ulang anggaran bulanan ${userName || 'Kak'} agar seimbang. 📈`;
   if (perDay <= 15000) {
     tipText = 'Setara dengan menyisihkan 1 cangkir kopi sachet per hari! Sangat realistis! ☕';
   } else if (perDay <= 50000) {
-    tipText = 'Setara dengan harga 1 porsi makan siang di luar. Anda pasti bisa! 🍲';
+    tipText = `Setara dengan harga 1 porsi makan siang di luar. ${userName || 'Kak'} pasti bisa! 🍲`;
   } else if (perDay <= 150000) {
     tipText = 'Setara dengan tiket nonton bioskop atau jajan akhir pekan. Skala prioritas! 🎬';
   }
@@ -96,7 +98,7 @@ export default function SavingsTab({
                       onClick={() => {
                         openConfirm(
                           'Hapus Target Tabungan',
-                          `Apakah Anda yakin ingin menghapus target "${g.title}"? Seluruh progres dana saat ini akan hilang.`,
+                          `Apakah ${userName || 'Kak'} yakin ingin menghapus target "${g.title}"? Seluruh progres dana saat ini akan hilang.`,
                           () => onDeleteGoal(g.id)
                         );
                       }}
@@ -124,7 +126,7 @@ export default function SavingsTab({
                 {percent >= 100 && (
                   <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 p-2.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-2xs">
                     <Sparkles size={12} className="text-emerald-600 animate-spin" />
-                    <span>Selamat! Target tabungan Anda telah tercapai! 🎉</span>
+                    <span>Selamat! Target tabungan {userName || 'Kak'} telah tercapai! 🎉</span>
                   </div>
                 )}
               </div>
@@ -140,8 +142,8 @@ export default function SavingsTab({
             <Calculator size={14} />
           </div>
           <div>
-            <h3 className="text-xs font-black text-slate-800 leading-tight">Kalkulator Impian (Simulasi)</h3>
-            <p className="text-[10px] text-slate-500 font-bold">Rencanakan tabungan masa depan Anda</p>
+            <h3 className="text-xs font-black text-slate-850 leading-tight">Kalkulator Impian (Simulasi)</h3>
+            <p className="text-[10px] text-slate-500 font-bold">Rencanakan tabungan masa depan {userName || 'Kak'}</p>
           </div>
         </div>
 
