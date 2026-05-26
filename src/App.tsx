@@ -35,6 +35,7 @@ import BillDetailDrawer from './components/modals/BillDetailDrawer';
 import ManageCategoriesModal from './components/modals/ManageCategoriesModal';
 import ManageAccountsModal from './components/modals/ManageAccountsModal';
 import OnboardingModal from './components/modals/OnboardingModal';
+import FloatingAssistant from './components/FloatingAssistant';
 
 interface Toast {
   id: string;
@@ -475,6 +476,13 @@ export default function App() {
           handleResetData={handleResetData}
           onOpenManageCategories={() => setShowManageCategoriesModal(true)}
           onOpenManageAccounts={() => setShowManageAccountsModal(true)}
+          onTriggerDailyReminder={() => {
+            localStorage.removeItem('last_dismissed_daily_reminder');
+            showToast('Pengingat harian di-reset! Memuat ulang...', 'success');
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }}
         />
 
         {/* DRAWER 6: TRANSACTION DETAIL */}
@@ -530,6 +538,18 @@ export default function App() {
           onClose={() => setShowOnboarding(false)}
           setUserName={setUserName}
           showToast={showToast}
+        />
+
+        {/* PERSISTENT FLOATING ASSISTANT WIDGET */}
+        <FloatingAssistant
+          transactions={transactions}
+          budgets={budgets}
+          userName={userName}
+          showOnboarding={showOnboarding}
+          onOpenAddTx={() => setShowAddTxModal(true)}
+          onOpenSettings={() => setShowSettingsModal(true)}
+          setCurrentTab={setCurrentTab}
+          currentTab={currentTab}
         />
 
       </div>

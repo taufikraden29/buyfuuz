@@ -10,6 +10,7 @@ interface SettingsModalProps {
   handleResetData: (loadDemo: boolean) => void;
   onOpenManageCategories: () => void;
   onOpenManageAccounts: () => void;
+  onTriggerDailyReminder?: () => void;
 }
 
 export default function SettingsModal({
@@ -21,7 +22,8 @@ export default function SettingsModal({
   openConfirm,
   handleResetData,
   onOpenManageCategories,
-  onOpenManageAccounts
+  onOpenManageAccounts,
+  onTriggerDailyReminder
 }: SettingsModalProps) {
   const handleExportData = () => {
     const data = {
@@ -187,6 +189,22 @@ export default function SettingsModal({
               </span>
               <ChevronRight size={14} className="text-slate-400" />
             </button>
+
+            {onTriggerDailyReminder && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onTriggerDailyReminder();
+                }}
+                className="w-full p-3.5 rounded-xl bg-indigo-50 border border-indigo-200 hover:bg-indigo-100/50 text-indigo-750 font-extrabold text-xs flex items-center justify-between cursor-pointer transition-all shadow-2xs active:scale-99"
+              >
+                <span className="flex items-center gap-2">
+                  <Bell size={14} className="text-indigo-600 animate-bounce" />
+                  Test Modal Pengingat Harian (Asisten)
+                </span>
+                <ChevronRight size={14} className="text-indigo-400" />
+              </button>
+            )}
 
             <button
               onClick={onOpenManageCategories}
